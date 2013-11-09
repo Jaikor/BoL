@@ -10,6 +10,8 @@
    1.0 - Initial Release
    To DO ?: 
    Let me know what else U would like to see in it.
+   Knows Bugs:
+   Need To Fix the Auto HP POTS and MANA, will update this ASAP ! meanwhile U can disable it in the menu so I won't spam pots.
  ]] --
 
 if myHero.charName ~= "Hecarim" then return end
@@ -163,8 +165,12 @@ function FullCombo()
 end
 
 function JungleClear()
-	JungleMob = AutoCarry.Jungle:GetAttackableMonster()
-	if JungleMob and not IsMyManaLow() then
+	if IsSACReborn then
+		JungleMob = AutoCarry.Jungle:GetAttackableMonster()
+	else
+		JungleMob = AutoCarry.GetMinionTarget()
+	end
+	if JungleMob ~= nil and not IsMyManaLow() then
 		if Extras.JungleQ and GetDistance(JungleMob) <= qRange then CastQ(JungleMob) end
 		if Extras.JungleW and GetDistance(JungleMob) <= wRange then CastW(JungleMob) end
 	end
