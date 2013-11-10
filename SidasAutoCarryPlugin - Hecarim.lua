@@ -1,5 +1,5 @@
 --[[
-	AutoCarry Plugin - Hecarim The Shadow Of War 1.0 by Jaikor & Skeem
+	AutoCarry Plugin - Hecarim The Shadow Of War 1.1 by Jaikor & Skeem
 	With Code from Kain
 	Auto Level from Dekaron
 	AoE Skillshot by monogato
@@ -8,10 +8,8 @@
 	Copyright 2013
 	Changelog :
    1.0 - Initial Release
-   To DO ?: 
-   Let me know what else U would like to see in it.
-   Knows Bugs:
-   Need To Fix the Auto HP POTS and MANA, will update this ASAP ! meanwhile U can disable it in the menu so I won't spam pots.
+   1.1 - Fixed Auto Pots
+         Smart Ks added (testing)
  ]] --
 
 if myHero.charName ~= "Hecarim" then return end
@@ -51,6 +49,21 @@ function PluginOnDraw()
 		if WREADY and Menu.wDraw then 
 			DrawCircle(myHero.x, myHero.y, myHero.z, wRange, 0x191970)
 		end
+		if Menu.cDraw then
+			for i=1, heroManager.iCount do
+			local Unit = heroManager:GetHero(i)
+				if ValidTarget(Unit) then
+					if waittxt[i] == 1 and (KillText[i] ~= nil or 0 or 1) then
+						PrintFloatText(Unit, 0, TextList[KillText[i]])
+					end
+				end
+			if waittxt[i] == 1 then
+				waittxt[i] = 30
+			else
+				waittxt[i] = waittxt[i]-1
+			end
+		end
+		end
 	end
 end
 
@@ -66,14 +79,16 @@ function PluginOnCreateObj(obj)
 			UsingHPot = true
 		end
 	end
-	if obj.name:find("ManaPotion_itm.troy") then
+	if obj.name:find("Global_Item_HealthPotion.troy") then
 		if GetDistance(obj, myHero) <= 70 then
-			UsingMPot = true
+			UsingHPot = true
+			UsingFlask = true
 		end
 	end
-	if obj.name:find("potion_manaheal") then
+	if obj.name:find("Global_Item_ManaPotion.troy") then
 		if GetDistance(obj, myHero) <= 70 then
 			UsingFlask = true
+			UsingMPot = true
 		end
 	end
 end
@@ -85,10 +100,12 @@ function PluginOnDeleteObj(obj)
 	if obj.name:find("Regenerationpotion_itm.troy") then
 		UsingHPot = false
 	end
-	if obj.name:find("ManaPotion_itm.troy") then
-		UsingMPot = false
+	if obj.name:find("Global_Item_HealthPotion.troy") then
+		UsingHPot = false
+		UsingFlask = false
 	end
-	if obj.name:find("potion_manaheal") then
+	if obj.name:find("Global_Item_ManaPotion.troy") then
+		UsingMPot = false
 		UsingFlask = false
 	end
 end
@@ -120,6 +137,90 @@ function NeedHP()
 		return true
 	else
 		return false
+	end
+end
+
+--[Smart KS Function]--
+function SmartKS()
+	 for i=1, heroManager.iCount do
+	 local enemy = heroManager:GetHero(i)
+		if ValidTarget(enemy) then
+			dfgDmg, hxgDmg, bwcDmg, iDmg  = 0, 0, 0, 0
+			qDmg = getDmg("Q",enemy,myHero)
+            eDmg = getDmg("E",enemy,myHero)
+			rDmg = getDmg("R",enemy,myHero)
+			if DFGREADY then dfgDmg = (dfgSlot and getDmg("DFG",enemy,myHero) or 0)	end
+            if HXGREADY then hxgDmg = (hxgSlot and getDmg("HXG",enemy,myHero) or 0) end
+            if BWCREADY then bwcDmg = (bwcSlot and getDmg("BWC",enemy,myHero) or 0) end
+            if IREADY then iDmg = (ignite and getDmg("IGNITE",enemy,myHero) or 0) end
+            onspellDmg = (liandrysSlot and getDmg("LIANDRYS",enemy,myHero) or 0)+(blackfireSlot and getDmg("BLACKFIRE",enemy,myHero) or 0)
+            itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
+			if Menu.sKS then
+				if enemy.health <= (qDmg) and GetDistance(enemy) <= qRange and QREADY then
+					if QREADY then CastQ(enemy) end
+				
+				elseif enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then
+					if EREADY then CastE(enemy) end
+				
+				elseif enemy.health <= (qDmg + eDmg) and GetDistance(enemy) <= eRange and EREADY and QREADY then
+					if EREADY then CastE(enemy) end
+					if QREADY then CastQ(enemy) end
+									
+				elseif enemy.health <= (qDmg + itemsDmg) and GetDistance(enemy) <= qRange and QREADY then
+					if DFGREADY then CastSpell(dfgSlot, enemy) end
+					if HXGREADY then CastSpell(hxgSlot, enemy) end
+					if BWCREADY then CastSpell(bwcSlot, enemy) end
+					if BRKREADY then CastSpell(brkSlot, enemy) end
+					if QREADY then CastQ(enemy) end
+				
+				elseif enemy.health <= (eDmg + itemsDmg) and GetDistance(enemy) <= eRange and EREADY then
+					if DFGREADY then CastSpell(dfgSlot, enemy) end
+					if HXGREADY then CastSpell(hxgSlot, enemy) end
+					if BWCREADY then CastSpell(bwcSlot, enemy) end
+					if BRKREADY then CastSpell(brkSlot, enemy) end
+					if EREADY then CastE(enemy) end
+				
+				elseif enemy.health <= (qDmg + eDmg + itemsDmg) and GetDistance(enemy) <= eRange
+					and EREADY and QREADY then
+						if DFGREADY then CastSpell(dfgSlot, enemy) end
+						if HXGREADY then CastSpell(hxgSlot, enemy) end
+						if BWCREADY then CastSpell(bwcSlot, enemy) end
+						if BRKREADY then CastSpell(brkSlot, enemy) end
+						if EREADY then CastE(enemy) end
+						if QREADY then CastQ(enemy) end
+				
+				elseif enemy.health <= (qDmg + eDmg + rDmg + itemsDmg) and GetDistance(enemy) <= qRange
+					and QREADY and EREADY and WREADY and RREADY and enemy.health > (qDmg + eDmg) then
+						if DFGREADY then CastSpell(dfgSlot, enemy) end
+						if HXGREADY then CastSpell(hxgSlot, enemy) end
+						if BWCREADY then CastSpell(bwcSlot, enemy) end
+						if BRKREADY then CastSpell(brkSlot, enemy) end
+						if EREADY and GetDistance(enemy) <= eRange then CastE(enemy) end
+						if QREADY and GetDistance(enemy) <= qRange then CastQ(enemy) end
+						if RREADY and GetDistance(enemy) <= rRange then CastSpell(_R, enemy) end						
+				
+				elseif enemy.health <= (rDmg + itemsDmg) and GetDistance(enemy) <= rRange
+					and not QREADY and not EREADY and RREADY then
+						if DFGREADY then CastSpell(dfgSlot, enemy) end
+						if HXGREADY then CastSpell(hxgSlot, enemy) end
+						if BWCREADY then CastSpell(bwcSlot, enemy) end
+						if BRKREADY then CastSpell(brkSlot, enemy) end
+						if RREADY then CastSpell(_R, enemy) end
+				
+				end
+								
+				if enemy.health <= iDmg and GetDistance(enemy) <= 600 then
+					if IREADY then CastSpell(ignite, enemy) end
+				end
+			end
+			KillText[i] = 1 
+			if enemy.health <= (qDmg + eDmg + itemsDmg) and QREADY and EREADY then
+			KillText[i] = 2
+			end
+			if enemy.health <= (qDmg + eDmg + rDmg + itemsDmg) and QREADY and EREADY and RREADY then
+			KillText[i] = 3
+			end
+		end
 	end
 end
 
@@ -156,7 +257,7 @@ function CastR(Target)
 function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
-			 if GetDistance(Target) <= eRange then CastSpell(_E) end
+			 if GetDistance(Target) <= eRange then CastSpell(_E) end                              
 			 if GetDistance(Target) <= wRange then CastSpell(_W) end
 			 if GetDistance(Target) <= qRange then CastSpell(_Q) end
 			 if Menu.useR and GetDistance(Target) <= rRange then CastR(Target) end
@@ -171,8 +272,8 @@ function JungleClear()
 		JungleMob = AutoCarry.GetMinionTarget()
 	end
 	if JungleMob ~= nil and not IsMyManaLow() then
-		if Extras.JungleQ and GetDistance(JungleMob) <= qRange then CastQ(JungleMob) end
-		if Extras.JungleW and GetDistance(JungleMob) <= wRange then CastW(JungleMob) end
+		if Extras.JungleQ and GetDistance(JungleMob) <= qRange then CastSpell(_Q) end
+		if Extras.JungleW and GetDistance(JungleMob) <= wRange then CastSpell(_W) end
 	end
 end
 
@@ -209,13 +310,15 @@ function mainMenu()
 	Menu:addParam("useR", "Use "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("sep2", "-- Mixed Mode Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("qHarass", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
+    Menu:addParam("sep3", "-- KS Options --", SCRIPT_PARAM_INFO, "")
+	Menu:addParam("sKS", "Use Smart Combo KS", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("sep5", "-- Draw Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("wDraw", "Draw "..wName.." (W)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("cDraw", "Draw Enemy Text", SCRIPT_PARAM_ONOFF, true)
 	Extras = scriptConfig("Sida's Auto Carry Plugin: "..myHero.charName..": Extras", myHero.charName)
 	Extras:addParam("sep6", "-- Misc --", SCRIPT_PARAM_INFO, "")
 	Extras:addParam("JungleQ", "Jungle with "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
-	Extras:addParam("JungleW", "Jungle with "..eName.." (W)", SCRIPT_PARAM_ONOFF, true)
+	Extras:addParam("JungleW", "Jungle with "..wName.." (W)", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("MinMana", "Minimum Mana for Jungle/Harass %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("ZWItems", "Auto Zhonyas/Wooglets", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("ZWHealth", "Min Health % for Zhonyas/Wooglets", SCRIPT_PARAM_SLICE, 15, 0, 100, -1)
