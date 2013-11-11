@@ -10,7 +10,7 @@
    1.0 - Initial Release
    1.1 - Fixed Auto Pots
          Smart Ks added (testing)
-		 added Better ulti Logic (thanks to friend ^^)
+         added Better ulti Logic (thanks to friend ^^)
  ]] --
 
 if myHero.charName ~= "Hecarim" then return end
