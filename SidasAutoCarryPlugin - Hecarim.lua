@@ -10,7 +10,6 @@
    1.0 - Initial Release
    1.1 - Fixed Auto Pots
          Smart Ks added (testing)
-         added Better ulti Logic (thanks to friend ^^)
  ]] --
 
 if myHero.charName ~= "Hecarim" then return end
@@ -189,6 +188,25 @@ function SmartKS()
 						if BRKREADY then CastSpell(brkSlot, enemy) end
 						if EREADY then CastE(enemy) end
 						if QREADY then CastQ(enemy) end
+				
+				elseif enemy.health <= (qDmg + eDmg + rDmg + itemsDmg) and GetDistance(enemy) <= qRange
+					and QREADY and EREADY and WREADY and RREADY and enemy.health > (qDmg + eDmg) then
+						if DFGREADY then CastSpell(dfgSlot, enemy) end
+						if HXGREADY then CastSpell(hxgSlot, enemy) end
+						if BWCREADY then CastSpell(bwcSlot, enemy) end
+						if BRKREADY then CastSpell(brkSlot, enemy) end
+						if EREADY and GetDistance(enemy) <= eRange then CastE(enemy) end
+						if QREADY and GetDistance(enemy) <= qRange then CastQ(enemy) end
+						if RREADY and GetDistance(enemy) <= rRange then CastSpell(_R, enemy) end						
+				
+				elseif enemy.health <= (rDmg + itemsDmg) and GetDistance(enemy) <= rRange
+					and not QREADY and not EREADY and RREADY then
+						if DFGREADY then CastSpell(dfgSlot, enemy) end
+						if HXGREADY then CastSpell(hxgSlot, enemy) end
+						if BWCREADY then CastSpell(bwcSlot, enemy) end
+						if BRKREADY then CastSpell(brkSlot, enemy) end
+						if RREADY then CastSpell(_R, enemy) end
+				
 				end
 								
 				if enemy.health <= iDmg and GetDistance(enemy) <= 600 then
@@ -210,7 +228,7 @@ function CountEnemies(point, range)
         local ChampCount = 0
         for j = 1, heroManager.iCount, 1 do
                 local enemyhero = heroManager:getHero(j)
-				if myHero.team ~= enemyhero.team and ValidTarget(enemyhero, range+400) then
+                if myHero.team ~= enemyhero.team and ValidTarget(enemyhero, QRange) then
                         if GetDistance(enemyhero, point) <= range then
                                 ChampCount = ChampCount + 1
                         end
@@ -221,13 +239,19 @@ end
 
 function CastR(Target)
     if RREADY then
-                local ultPos = GetAoESpellPosition(300, Target)
-                if ultPos and GetDistance(ultPos) <= rRange then
-                        if CountEnemies(ultPos, 300) > 2 then
-                                CastSpell(_R, ultPos.x, ultPos.z)
-                        end
-                end
-        end
+		local ultPos = GetAoESpellPosition(300, Target)
+		if ultPos and GetDistance(ultPos) <= rRange then
+			if CountEnemies(ultPos, 300) > 1 then
+				CastSpell(_R, ultPos.x, ultPos.z)
+			end
+		end
+		if IsSACReborn then
+			SkillR:Cast(Target)
+		else
+			AutoCarry.CastSkillshot(SkillR, Target)
+		end
+	end
+ end
 
 --[Full Combo with Items]--
 function FullCombo()
