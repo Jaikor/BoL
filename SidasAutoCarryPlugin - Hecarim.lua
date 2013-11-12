@@ -30,6 +30,7 @@ function PluginOnTick()
 		AutoCarry.SkillsCrosshair.range = 1000
 	end
 	Checks()
+	SmartKS()
 	
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
@@ -228,7 +229,6 @@ function CastR(Target)
                         end
                 end
         end
-end
 
 --[Full Combo with Items]--
 function FullCombo()
