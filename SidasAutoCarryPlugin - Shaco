@@ -1,12 +1,15 @@
 --[[
-	AutoCarry Plugin - Shaco The Demon Jester 1.1 by Jaikor 
+	AutoCarry Plugin - Shaco The Demon Jester 1.2 by Jaikor 
 	With Code from Pain ( This is his work I just added new stuff with his permission and Updated it)
 	All credit goes Basicly to Pain.
+	Credit to HeX for some Epic features
 	Credit to Skeem for his codes too xD
 	Codes from Kain and Trololz
 	I'm Still learning so don't be hard.
 	Copyright 2013
 	Changelog :
+	1.2 - The R (ulti) has 3 modes it detects it Automaticly
+	      1st killing enemy if, 2nd fighting/teamfight/distraction, 3rd low distraction/avoid damage (escaping) if your HP drops below a certain %
 	1.1 - Added R to Combo with a Slide Bar to Toggle R in Combo Mode
     1.0 - Initial Release
     TO DO:
@@ -218,7 +221,7 @@ function FullCombo()
 		    if GetDistance(Target) <= qRange then CastSpell(_Q, Target.x, Target.z) end
 			if GetDistance(Target) <= wRange then CastW(Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
-			if Menu.useR and GetDistance(Target) <= rRange and Target.health < Target.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, Target) end 
+			if Menu.useR and GetDistance(Target) <= rRange and (Target.health < Target.maxHealth*(Menu.PercentofHealth/100) or CountEnemyHeroInRange(500) > 2 or myHero.health < myHero.maxHealth*0.25) then CastSpell(_R) end
 		end
 	end
 end
