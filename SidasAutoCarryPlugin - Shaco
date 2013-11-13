@@ -11,9 +11,9 @@
 	1.2 - The R (ulti) has 3 modes it detects it Automaticly
 	      1st killing enemy if, 2nd fighting/teamfight/distraction, 3rd low distraction/avoid damage (escaping) if your HP drops below a certain %
 	1.1 - Added R to Combo with a Slide Bar to Toggle R in Combo Mode
-        1.0 - Initial Release
-        TO DO:
-        I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
+    1.0 - Initial Release
+    TO DO:
+    I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
  ]] --
 
  --[[TargetPos = Vector(Target.x, Target.y, Target.z)
@@ -220,9 +220,6 @@ function SmartKS()
 			KillText[i] = 1 
 			if enemy.health <= (qDmg + eDmg + itemsDmg) and QREADY and EREADY then
 			KillText[i] = 2
-			end
-			if enemy.health <= (qDmg + eDmg + rDmg + itemsDmg) and QREADY and EREADY and RREADY then
-			KillText[i] = 3
 			end
 		end
 	end
