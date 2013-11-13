@@ -8,9 +8,9 @@
 	Copyright 2013
 	Changelog :
 	1.1 - Added R to Combo with a Slide Bar to Toggle R in Combo Mode
-	1.0 - Initial Release
-        TO DO:
-        I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
+    1.0 - Initial Release
+    TO DO:
+    I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
  ]] --
 
  --[[TargetPos = Vector(Target.x, Target.y, Target.z)
@@ -39,7 +39,7 @@ function PluginOnTick()
 
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
-		if Menu.eHarass and not IsMyManaLow() and GetDistance(Target) <= eRange then CastSpell(_E) end
+		if Menu.eHarass and not IsMyManaLow() and GetDistance(Target) <= eRange then CastSpell(_E, Target) end
 	end
 	if Carry.LaneClear then JungleClear() end
 	
@@ -174,13 +174,11 @@ function SmartKS()
             onspellDmg = (liandrysSlot and getDmg("LIANDRYS",enemy,myHero) or 0)+(blackfireSlot and getDmg("BLACKFIRE",enemy,myHero) or 0)
             itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
 			if Menu.sKS then
-				if enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then
-					if EREADY then CastSpell(_E, enemy) end
+				if enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then CastSpell(_E, enemy) end
 				
-				elseif enemy.health <= (wDmg) and GetDistance(enemy) <= wRange and WREADY then
-					if WREADY then CastW(enemy) end
+				elseif enemy.health <= (wDmg) and GetDistance(enemy) <= wRange and WREADY then CastW(enemy) end
 				
-				elseif enemy.health <= (eDmg + wDmg) and GetDistance(enemy) <= eRange and WREADY and WREADY then
+				elseif enemy.health <= (eDmg + wDmg) and GetDistance(enemy) <= eRange then
 					if EREADY then CastSpell(_E, enemy) end
 					if WREADY then CastW(enemy) end
 									
@@ -220,7 +218,7 @@ function FullCombo()
 		    if GetDistance(Target) <= qRange then CastSpell(_Q, Target.x, Target.z) end
 			if GetDistance(Target) <= wRange then CastW(Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
-			if Menu.useR and GetDistance(Target) <= rRange and Target.health < Target.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R) end 
+			if Menu.useR and GetDistance(Target) <= rRange and Target.health < Target.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, Target) end 
 		end
 	end
 end
