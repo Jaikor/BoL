@@ -11,9 +11,9 @@
 	1.2 - The R (ulti) has 3 modes it detects it Automaticly
 	      1st killing enemy if, 2nd fighting/teamfight/distraction, 3rd low distraction/avoid damage (escaping) if your HP drops below a certain %
 	1.1 - Added R to Combo with a Slide Bar to Toggle R in Combo Mode
-    1.0 - Initial Release
-    TO DO:
-    I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
+        1.0 - Initial Release
+        TO DO:
+        I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
  ]] --
 
  --[[TargetPos = Vector(Target.x, Target.y, Target.z)
@@ -89,90 +89,7 @@ function PluginOnCreateObj(obj)
 			Recall = true
 		end
 	end
-	if obj.name:find("Regenerationpotion_itm.troy") then91
-92
-93
-94
-95
-96
-97
-98
-99
-100
-101
-102
-103
-104
-105
-106
-107
-108
-109
-110
-111
-112
-113
-114
-115
-116
-117
-118
-119
-120
-121
-122
-123
-124
-125
-126
-127
-128
-129
-130
-131
-        end
-        if obj.name:find("Regenerationpotion_itm.troy") then
-                if GetDistance(obj, myHero) <= 70 then
-                        UsingHPot = true
-                end
-        end
-        if obj.name:find("Global_Item_HealthPotion.troy") then
-                if GetDistance(obj, myHero) <= 70 then
-                        UsingHPot = true
-                        UsingFlask = true
-                end
-        end
-        if obj.name:find("Global_Item_ManaPotion.troy") then
-                if GetDistance(obj, myHero) <= 70 then
-                        UsingFlask = true
-                        UsingMPot = true
-                end
-        end
-        if object ~= nil and object.name:find("Jester_Copy") then
-                shacoClone = object
-    end
-end
-function PluginOnDeleteObj(obj)
-        if obj.name:find("TeleportHome.troy") then
-                Recall = false
-        end
-        if obj.name:find("Regenerationpotion_itm.troy") then
-                UsingHPot = false
-        end
-        if obj.name:find("Global_Item_HealthPotion.troy") then
-                UsingHPot = false
-                UsingFlask = false
-        end
-        if obj.name:find("Global_Item_ManaPotion.troy") then
-                UsingMPot = false
-                UsingFlask = false
-        end
-        if object ~= nil and object.name:find("Jester_Copy") then
-        shacoClone = nil
-    end
-Commit summary: Extended description: (optional)
-Jaikor pedrodsp@gmail.com
-
+	if obj.name:find("Regenerationpotion_itm.troy") then
 		if GetDistance(obj, myHero) <= 70 then
 			UsingHPot = true
 		end
@@ -246,13 +163,13 @@ end
 
 --[Smart KS Function]--
 function SmartKS()
-	 for i=1, heroManager.iCount do
+	for i=1, heroManager.iCount do
 	 local enemy = heroManager:GetHero(i)
-		if ValidTarget(enemy) then
+	    if ValidTarget(enemy) then
 			dfgDmg, hxgDmg, bwcDmg, iDmg  = 0, 0, 0, 0
-			wDmg = getDmg("W",enemy,myHero)
+			qDmg = getDmg("Q",enemy,myHero)
             eDmg = getDmg("E",enemy,myHero)
-			rDmg = getDmg("R",enemy,myHero)
+			wDmg = getDmg("W",enemy,myHero)
 			if DFGREADY then dfgDmg = (dfgSlot and getDmg("DFG",enemy,myHero) or 0)	end
             if HXGREADY then hxgDmg = (hxgSlot and getDmg("HXG",enemy,myHero) or 0) end
             if BWCREADY then bwcDmg = (bwcSlot and getDmg("BWC",enemy,myHero) or 0) end
@@ -260,14 +177,23 @@ function SmartKS()
             onspellDmg = (liandrysSlot and getDmg("LIANDRYS",enemy,myHero) or 0)+(blackfireSlot and getDmg("BLACKFIRE",enemy,myHero) or 0)
             itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
 			if Menu.sKS then
-				if enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then CastSpell(_E, enemy) end
-				
-				elseif enemy.health <= (wDmg) and GetDistance(enemy) <= wRange and WREADY then CastW(enemy) end
-				
-				elseif enemy.health <= (eDmg + wDmg) and GetDistance(enemy) <= eRange then
+				if enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then
 					if EREADY then CastSpell(_E, enemy) end
+				
+				elseif enemy.health <= (wDmg) and GetDistance(enemy) <= wRange and WREADY then
 					if WREADY then CastW(enemy) end
+				
+				elseif enemy.health <= (qDmg + eDmg) and GetDistance(enemy) <= eRange and EREADY and QREADY then
+					if QREADY then CastSpell(_Q, Target.x, Target.z)
+					if EREADY then CastSpell(_E, enemy) end
 									
+				elseif enemy.health <= (qDmg + itemsDmg) and GetDistance(enemy) <= qRange and QREADY then
+					if DFGREADY then CastSpell(dfgSlot, enemy) end
+					if HXGREADY then CastSpell(hxgSlot, enemy) end
+					if BWCREADY then CastSpell(bwcSlot, enemy) end
+					if BRKREADY then CastSpell(brkSlot, enemy) end
+					if QREADY then CastSpell(_Q, Target.x, Target.z) end
+				
 				elseif enemy.health <= (eDmg + itemsDmg) and GetDistance(enemy) <= eRange and EREADY then
 					if DFGREADY then CastSpell(dfgSlot, enemy) end
 					if HXGREADY then CastSpell(hxgSlot, enemy) end
@@ -275,14 +201,16 @@ function SmartKS()
 					if BRKREADY then CastSpell(brkSlot, enemy) end
 					if EREADY then CastSpell(_E, enemy) end
 				
-				elseif enemy.health <= (eDmg + wDmg + itemsDmg) and GetDistance(enemy) <= eRange
-					and EREADY and WREADY then
+				elseif enemy.health <= (qDmg + eDmg + itemsDmg) and GetDistance(enemy) <= eRange
+					and EREADY and QREADY then
 						if DFGREADY then CastSpell(dfgSlot, enemy) end
 						if HXGREADY then CastSpell(hxgSlot, enemy) end
 						if BWCREADY then CastSpell(bwcSlot, enemy) end
 						if BRKREADY then CastSpell(brkSlot, enemy) end
 						if EREADY then CastSpell(_E, enemy) end
-						if WREADY then CastW(enemy) end
+						if QREADY then CastSpell(_Q, Target.x, Target.z) end
+						
+				
 				end
 								
 				if enemy.health <= iDmg and GetDistance(enemy) <= 600 then
@@ -290,11 +218,15 @@ function SmartKS()
 				end
 			end
 			KillText[i] = 1 
-			if enemy.health <= (eDmg + wDmg + itemsDmg) and EREADY and WREADY then
+			if enemy.health <= (qDmg + eDmg + itemsDmg) and QREADY and EREADY then
 			KillText[i] = 2
+			end
+			if enemy.health <= (qDmg + eDmg + rDmg + itemsDmg) and QREADY and EREADY and RREADY then
+			KillText[i] = 3
 			end
 		end
 	end
+end
 end
 
 --[Full Combo with Items]--
