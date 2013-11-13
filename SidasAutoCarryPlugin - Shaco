@@ -220,7 +220,7 @@ function FullCombo()
 		    if GetDistance(Target) <= qRange then CastSpell(_Q, Target.x, Target.z) end
 			if GetDistance(Target) <= wRange then CastW(Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
-			if Menu.useR and GetDistance(Target) <= rRange and Target.health < Target.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, Target) end 
+			if Menu.useR and GetDistance(Target) <= rRange and Target.health < Target.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R) end 
 		end
 	end
 end
