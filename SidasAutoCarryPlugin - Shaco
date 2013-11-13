@@ -1,15 +1,15 @@
 --[[
-	AutoCarry Plugin - Shaco The Demon Jester 1.0 by Jaikor 
+	AutoCarry Plugin - Shaco The Demon Jester 1.1 by Jaikor 
 	With Code from Pain ( This is his work I just added new stuff with his permission and Updated it)
 	All credit goes Basicly to Pain.
 	Codes from Kain and Trololz
 	I'm Still learning so don't be hard.
 	Copyright 2013
-	Special Thanks to HeX for helping me.
 	Changelog :
-   1.0 - Initial Release
-   TO DO:
-   I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
+	1.1 - Added R to Combo with a Slide Bar to Toggle R in Combo Mode
+	1.0 - Initial Release
+        TO DO:
+        I'll be working on Using the Shaco Ulti to dodge ulti from champs like Caits, ashe and so on
  ]] --
 
  --[[TargetPos = Vector(Target.x, Target.y, Target.z)
@@ -212,7 +212,6 @@ function SmartKS()
 	end
 end
 
-
 --[Full Combo with Items]--
 function FullCombo()
 	if Target then
@@ -220,6 +219,7 @@ function FullCombo()
 		    if GetDistance(Target) <= qRange then CastSpell(_Q, Target.x, Target.z) end
 			if GetDistance(Target) <= wRange then CastW(Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
+			if Menu.useR and GetDistance(Target) <= rRange and Target.health < Target.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, Target) end 
 		end
 	end
 end
@@ -266,10 +266,13 @@ function mainMenu()
 	Menu:addParam("eHarass", "Use "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
     Menu:addParam("sep3", "-- KS Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("sKS", "Use Smart Combo KS", SCRIPT_PARAM_ONOFF, true)
-	Menu:addParam("sep5", "-- Draw Options --", SCRIPT_PARAM_INFO, "")
+	Menu:addParam("sep4", "-- Draw Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("wDraw", "Draw "..wName.." (W)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("DrawR", "Draw Circles for Clone", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("cDraw", "Draw Enemy Text", SCRIPT_PARAM_ONOFF, true)
+	Menu:addParam("sep5", "-- Ulti Options --", SCRIPT_PARAM_INFO, "")
+	Menu:addParam("useR", "Use "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)
+	Menu:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras = scriptConfig("Sida's Auto Carry Plugin: "..myHero.charName..": Extras", myHero.charName)
 	Extras:addParam("sep6", "-- Misc --", SCRIPT_PARAM_INFO, "")
 	Extras:addParam("JungleE", "Jungle with "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
