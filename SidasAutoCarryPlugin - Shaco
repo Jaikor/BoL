@@ -323,3 +323,4 @@ function Checks()
 	MPREADY =(mpSlot ~= nil and myHero:CanUseSpell(mpSlot) == READY)
 	FSKREADY = (fskSlot ~= nil and myHero:CanUseSpell(fskSlot) == READY)
 end
+
