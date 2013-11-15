@@ -229,6 +229,7 @@ function CastR(Target)
                         end
                 end
         end
+end
 
 --[Full Combo with Items]--
 function FullCombo()
