@@ -243,6 +243,7 @@ function FullCombo()
 		end
 	end
 end
+end
 
 function JungleClear()
 	if IsSACReborn then
