@@ -27,6 +27,7 @@ function PluginOnTick()
 	end
 	Checks()
 	SmartKS()
+	farmMinions:update()
 	
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
@@ -38,7 +39,7 @@ function PluginOnTick()
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
 	if Extras.aMP and IsMyManaLow() and not (UsingMPot or UsingFlask) and(MPREADY or FSKREADY) then CastSpell((mpSlot or fskSlot)) end
 	if Extras.AutoLevelSkills then autoLevelSetSequence(levelSequence) end
-	if Menu.qFarm then
+	if Extras.qFarm then
 		for _, minion in pairs(farmMinions.objects) do
 			if minion and ValidTarget(minion) and QREADY and GetDistance(minion) <= qRange then
 				if minion.health < qDmg(minion) then
@@ -239,7 +240,7 @@ players = heroManager.iCount
 					CastSpell(_R, target)
 			end
 		end
-	end
+end
 --end of it
 
 --[Full Combo with Items]--
@@ -293,7 +294,6 @@ function mainMenu()
 	Menu:addParam("useQ", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("useW", "Use "..wName.." (W)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("useE", "Use "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
-	Menu:addParam("qFarm", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
 	Menu:addParam("sep2", "-- Mixed Mode Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("qHarass", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("sep3", "-- Draw Options --", SCRIPT_PARAM_INFO, "")
@@ -304,6 +304,7 @@ function mainMenu()
 	Menu:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras = scriptConfig("Sida's Auto Carry Plugin: "..myHero.charName..": Extras", myHero.charName)
 	Extras:addParam("sep5", "-- Misc --", SCRIPT_PARAM_INFO, "")
+	Extras:addParam("qFarm", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
 	Extras:addParam("JungleQ", "Jungle with "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("MinMana", "Minimum Mana for Jungle/Harass %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("ZWItems", "Auto Zhonyas/Wooglets", SCRIPT_PARAM_ONOFF, true)
