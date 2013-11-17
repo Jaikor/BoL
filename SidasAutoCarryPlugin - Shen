@@ -26,6 +26,7 @@ function PluginOnTick()
 		AutoCarry.SkillsCrosshair.range = 25000
 	end
 	Checks()
+	SmartKS()
 	
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
@@ -168,14 +169,14 @@ function SmartKS()
             itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
 			if Menu.sKS then
 				if enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then
-					if EREADY then CastSpell(_E, enemy) end
+					if EREADY then CastE(enemy) end
 				
 				elseif enemy.health <= (qDmg) and GetDistance(enemy) <= qRange and QREADY then
 					if QREADY then CastSpell(_Q, enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg) and GetDistance(enemy) <= eRange and EREADY and QREADY then
 					if QREADY then CastSpell(_Q, enemy)
-					if EREADY then CastSpell(_E, enemy) end
+					if EREADY then CastE(enemy) end
 									
 				elseif enemy.health <= (qDmg + itemsDmg) and GetDistance(enemy) <= qRange and QREADY then
 					if DFGREADY then CastSpell(dfgSlot, enemy) end
@@ -189,7 +190,7 @@ function SmartKS()
 					if HXGREADY then CastSpell(hxgSlot, enemy) end
 					if BWCREADY then CastSpell(bwcSlot, enemy) end
 					if BRKREADY then CastSpell(brkSlot, enemy) end
-					if EREADY then CastSpell(_E, enemy) end
+					if EREADY then CastE(enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg + itemsDmg) and GetDistance(enemy) <= eRange
 					and EREADY and QREADY then
@@ -197,7 +198,7 @@ function SmartKS()
 						if HXGREADY then CastSpell(hxgSlot, enemy) end
 						if BWCREADY then CastSpell(bwcSlot, enemy) end
 						if BRKREADY then CastSpell(brkSlot, enemy) end
-						if EREADY then CastSpell(_E, enemy) end
+						if EREADY then CastE(enemy) end
 						if QREADY then CastSpell(_Q, Target) end
 						
 				
@@ -283,6 +284,7 @@ function mainLoad()
 	for i=1, heroManager.iCount do waittxt[i] = i*3 end -- All credits to Dekaron
 	levelSequence = { 1, 2, 3, 1, 1, 4, 1, 1, 2, 2, 4, 2, 2, 3, 3, 4, 3, 3, }
 	SkillE = {spellKey = _E, range = rRange, speed = eSpeed, delay = eDelay, width = eWidth, configName = eName, displayName = "E "..eName.."", enabled = true, skillShot = true, minions = false, reset = false, reqTarget = false }
+	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
 end
 
 --[Main Menu & Extras Menu]--
