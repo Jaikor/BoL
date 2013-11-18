@@ -110,6 +110,12 @@ function PluginOnDeleteObj(obj)
 	end
 end
 
+function OnAttacked()
+	if Target and Carry.AutoCarry then
+		if QREADY and Menu.useQ and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
+	end
+end
+
 --[Low Mana Function by Kain]--
 function IsMyManaLow()
     if myHero.mana < (myHero.maxMana * ( Extras.MinMana / 100)) then
