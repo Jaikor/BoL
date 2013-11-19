@@ -42,7 +42,7 @@ function PluginOnTick()
 	  if Extras.qFarm and Carry.LastHit then
 	  for _, minion in pairs(farmMinions.objects) do
 			if minion and ValidTarget(minion) and QREADY and GetDistance(minion) <= qRange then
-				if minion.health < qDmg(minion) then CastSpell(_Q, minion) end
+				if minion.health < qDmg then CastSpell(_Q, minion) end
             end 
 		end
 	end
