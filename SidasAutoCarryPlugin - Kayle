@@ -30,7 +30,17 @@ function PluginOnTick()
 	
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
-		if Menu.qHarass and not IsMyManaLow() and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
+	if Target and (Carry.AutoCarry or Carry.MixedMode) then
+            if WREADY and Menu.useW and GetDistance(Target) < wBuffer then
+				    if (myHero.health / myHero.maxHealth) < Menu.HealHealth then
+							CastSpell(_W)
+					end
+                end
+			if WREADY and Menu.useW and GetDistance(Target) > wBuffer then
+					CastSpell(_W)
+				end
+    end
+	if Menu.qHarass and not IsMyManaLow() and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
 	end
 	if Carry.LaneClear then JungleClear() end
 	
@@ -38,6 +48,7 @@ function PluginOnTick()
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
 	if Extras.aMP and IsMyManaLow() and not (UsingMPot or UsingFlask) and(MPREADY or FSKREADY) then CastSpell((mpSlot or fskSlot)) end
 	if Extras.AutoLevelSkills then autoLevelSetSequence(levelSequence) end
+	
 	  if Extras.qFarm and Carry.LastHit then
 	  for _, minion in pairs(farmMinions.objects) do
 			if minion and ValidTarget(minion) and QREADY and GetDistance(minion) <= qRange then
@@ -51,8 +62,25 @@ end
 function PluginOnDraw()
 	if not myHero.dead then
 		if QREADY and Menu.qDraw then 
-			DrawCircle(myHero.x, myHero.y, myHero.z, qRange, 0x191970)
+			DrawCircle(myHero.x, myHero.y, myHero.z, eRange, 0x191970)
 		end
+		if Menu.cDraw then
+			for i=1, heroManager.iCount do
+			local Unit = heroManager:GetHero(i)
+				if ValidTarget(Unit) then
+					if waittxt[i] == 1 and (KillText[i] ~= nil or 0 or 1) then
+						PrintFloatText(Unit, 0, TextList[KillText[i]])
+					end
+				end
+			if waittxt[i] == 1 then
+				waittxt[i] = 30
+			else
+				waittxt[i] = waittxt[i]-1
+			end
+		end
+		end
+	
+        
 	end
 end
 
@@ -263,14 +291,6 @@ function FullCombo()
 		if AutoCarry.MainMenu.AutoCarry then
 			if GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end
-			if WREADY and Menu.useW and GetDistance(Target) < wBuffer then
-		            if (myHero.health / myHero.maxHealth) < Menu.HealHealth then
-						CastSpell(_W)
-					end
-            end
-			if WREADY and Menu.useW and GetDistance(Target) > wBuffer then
-				CastSpell(_W)
-			end
 		end
 	end
 end
