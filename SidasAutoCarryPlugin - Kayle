@@ -42,7 +42,13 @@ function PluginOnTick()
     end
 	if Menu.qHarass and not IsMyManaLow() and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
 	end
-	if Carry.LaneClear then JungleClear() end
+	if(Carry.LaneClear or JungleClear ()) then
+				for _, minion in pairs(AutoCarry.EnemyMinions().objects) do
+					if ValidTarget(minion) and GetDistance(minion) <= eRange and EREADY then
+						CastSpell(_E)
+					end
+				end
+		end
 	
 	if Extras.ZWItems and IsMyHealthLow() and Target and (ZNAREADY or WGTREADY) then CastSpell((wgtSlot or znaSlot)) end
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
