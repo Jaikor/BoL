@@ -287,7 +287,6 @@ players = heroManager.iCount
 		if target ~= nil and target.team == player.team and target.visible and not target.dead then
 			  if RREADY and Menu.useR and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or CountEnemyHeroInRange(500) > 2 or myHero.health < myHero.maxHealth*0.25) then CastSpell(_R) end
 					CastSpell(_R, target)
-			end
 		end
 end
 --end of it
