@@ -27,6 +27,14 @@ function PluginOnTick()
 	Checks()
 	SmartKS()
 	farmMinions:update()
+	if Menu.HealAll then Healing() end
+		if Carry.LaneClear then
+			for _, minion in pairs(AutoCarry.EnemyMinions().objects) do
+					if ValidTarget(minion) and GetDistance(minion) <= eRange and EREADY then
+						CastSpell(_E)
+					end
+				end
+		end
 	
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
@@ -196,8 +204,9 @@ function Healing()
 					end
 				end
 			end
-		end
+			end
 end
+
 
 
 
@@ -285,7 +294,9 @@ players = heroManager.iCount
 		target = heroManager:getHero(i)
 
 		if target ~= nil and target.team == player.team and target.visible and not target.dead then
-			  if RREADY and Menu.useR and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or CountEnemyHeroInRange(500) > 2 or myHero.health < myHero.maxHealth*0.25) then CastSpell(_R, target) end
+			  if RREADY and Menu.useR and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or (CountEnemies(target, 500) > 2 and target.health < target.maxHealth*0.4)) then 
+					CastSpell(_R, target)
+			end
 		end
 end
 --end of it
