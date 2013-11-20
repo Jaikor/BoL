@@ -279,10 +279,11 @@ players = heroManager.iCount
 		target = heroManager:getHero(i)
 
 		if target ~= nil and target.team == player.team and target.visible and not target.dead then
-	          if RREADY and Menu.useR and GetDistance(target) <= rRange and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or CountEnemyHeroInRange(500) > 2 or myHero.health < myHero.maxHealth*0.25) then CastSpell(_R, target) end
+			  if RREADY and Menu.useR and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or (CountEnemies(target, 500) > 2 and target.health < target.maxHealth*0.4)) then 
+					CastSpell(_R, target)
+			end
+		end
 end
-end
-
 --end of it
 
 --[Full Combo with Items]--
@@ -290,7 +291,7 @@ function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
 			if GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
-			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end
+			if GetDistance(Target) <= eRange then CastSpell(_E) end
 		end
 	end
 end
@@ -355,6 +356,8 @@ function mainMenu()
 	Extras:addParam("aMP", "Auto Auto Mana Pots", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("HPHealth", "Min % for Health Pots", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 end
+
+
 
 --[Certain Checks]--
 function Checks()
