@@ -2,6 +2,7 @@
 	AutoCarry Plugin - Kayle The Judicator 1.0 by Jaikor 
 	With Code from Skeem
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
+	Credtis to fbragequit for the AA idea. thanks 
 	I'm Still learning so don't be hard.
 	Copyright 2013
 	Changelog :
@@ -98,7 +99,28 @@ function PluginOnDraw()
 	end
 end
 
+function OnGainBuff(unit, buff)
+	if unit.isMe and buff.name == eBuff then
+		AutoCarry.MyHero.IsMelee = false
+		EM.range = 625.5
+		eFlag = true
+	end
+end
 
+function OnLoseBuff(unit, buff)
+	if unit.isMe and buff.name == eBuff then
+		AutoCarry.MyHero.IsMelee = true
+		EM.range = 255.5
+		eFlag = false
+	end 
+end
+
+function BonusDamage()
+	if eFlag then
+		return (myHero:GetSpellData(_E).level * 10 + 10) + myHero.ap * 0.4
+	end
+	return 0
+end
 
 --[Object Detection]--
 function PluginOnCreateObj(obj)
@@ -209,8 +231,6 @@ end
 
 
 
-
-
 --[Smart KS Function]--
 function SmartKS()
 	for i=1, heroManager.iCount do
@@ -276,6 +296,8 @@ function SmartKS()
 end
 end
 
+
+
 function CountEnemies(point, range)
         local ChampCount = 0
         for i = 1, heroManager.iCount, 1 do
@@ -292,8 +314,7 @@ end
 players = heroManager.iCount
  for i = 1, players, 1 do
 		target = heroManager:getHero(i)
-
-		if target ~= nil and target.team == player.team and target.visible and not target.dead then
+            if target ~= nil and target.team == player.team and target.visible and not target.dead then
 			  if RREADY and Menu.useR and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or (CountEnemies(target, 500) > 2 and target.health < target.maxHealth*0.4)) then 
 					CastSpell(_R, target)
 			end
@@ -330,7 +351,7 @@ function mainLoad()
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
 	qRange,wRange,eRange,rRange = 650, 900, 525, 900
-	QREADY, WREADY, EREADY, RREADY = false, false, false, false
+	QREADY, WREADY, EREADY, eFlag, RREADY = false, false, false, false, false
 	qName, wName, eName, rName = "Reckoning", "Devine Blessing", "Righteous Fury", "Intervention"
 	HK1, HK2, HK3 = string.byte("Z"), string.byte("K"), string.byte("G")
 	Menu = AutoCarry.PluginMenu
@@ -341,6 +362,10 @@ function mainLoad()
 	waittxt = {} -- prevents UI lags, all credits to Dekaron
 	for i=1, heroManager.iCount do waittxt[i] = i*3 end -- All credits to Dekaron
 	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
+	EM = AutoCarry.EnemyMinions()
+	AdvancedCallback:bind('OnGainBuff', function(unit, buff) OnGainBuff(unit, buff) end)
+	AdvancedCallback:bind('OnLoseBuff', function(unit, buff) OnLoseBuff(unit, buff) end)
+	eBuff = "JudicatorRighteousFury"
 end
 
 --[Main Menu & Extras Menu]--
@@ -362,7 +387,7 @@ function mainMenu()
 	Menu:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras = scriptConfig("Sida's Auto Carry Plugin: "..myHero.charName..": Extras", myHero.charName)
 	Extras:addParam("sep5", "-- Misc --", SCRIPT_PARAM_INFO, "")
-	Extras:addParam("qFarm", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
+	Extras:addParam("qFarm", "Use Q farm "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
 	Extras:addParam("JungleE", "Jungle with "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("MinMana", "Minimum Mana for Jungle/Harass %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("ZWItems", "Auto Zhonyas/Wooglets", SCRIPT_PARAM_ONOFF, true)
@@ -370,6 +395,7 @@ function mainMenu()
 	Extras:addParam("aHP", "Auto Health Pots", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("aMP", "Auto Auto Mana Pots", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("HPHealth", "Min % for Health Pots", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
+	AutoCarry.Plugins:RegisterBonusLastHitDamage(BonusDamage)
 end
 
 
