@@ -39,7 +39,7 @@ function PluginOnTick()
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
 	if Extras.aMP and IsMyManaLow() and not (UsingMPot or UsingFlask) and(MPREADY or FSKREADY) then CastSpell((mpSlot or fskSlot)) end
 	if Extras.AutoLevelSkills then autoLevelSetSequence(levelSequence) end
-	  if Extras.qFarm and Carry.LastHit then
+	if Extras.qFarm and Carry.LastHit then
 	  for _, minion in pairs(farmMinions.objects) do
 			if minion and ValidTarget(minion) and QREADY and GetDistance(minion) <= qRange then
 				if minion.health < qDmg then CastSpell(_Q, minion) end
