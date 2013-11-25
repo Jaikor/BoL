@@ -36,21 +36,9 @@ function PluginOnTick()
 					end
 				end
 		end
-	
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
-	if Target and Carry.AutoCarry or Carry.MixedMode then
-            if WREADY and Menu.useW and GetDistance(Target) < wBuffer then
-				    if (myHero.health / myHero.maxHealth) < Menu.HealHealth then
-							CastSpell(_W)
-					end
-                end
-			if WREADY and Menu.useW and GetDistance(Target) > wBuffer then
-					CastSpell(_W)
-				end
-    end
 	if Menu.qHarass and not IsMyManaLow() and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
-	end
 	if Carry.LaneClear or JungleClear() then
 				for _, minion in pairs(AutoCarry.EnemyMinions().objects) do
 					if ValidTarget(minion) and GetDistance(minion) <= eRange and EREADY then
@@ -58,7 +46,7 @@ function PluginOnTick()
 					end
 				end
 		end
-	
+	end
 	if Extras.ZWItems and IsMyHealthLow() and Target and (ZNAREADY or WGTREADY) then CastSpell((wgtSlot or znaSlot)) end
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
 	if Extras.aMP and IsMyManaLow() and not (UsingMPot or UsingFlask) and(MPREADY or FSKREADY) then CastSpell((mpSlot or fskSlot)) end
@@ -296,12 +284,20 @@ function SmartKS()
 end
 end
 
+
 --[Full Combo with Items]--
 function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
 			if GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E) end
+			if Menu.useW and WREADY and GetDistance(Target) < wBuffer then
+				if (myHero.health / myHero.maxHealth) < Menu.HealHealth then
+							CastSpell(_W) end
+                end
+			if Menu.useW and WREADY and GetDistance(Target) > wBuffer then
+					CastSpell(_W)
+			end
 		end
 	end
 end
