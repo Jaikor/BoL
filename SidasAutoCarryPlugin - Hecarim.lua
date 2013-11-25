@@ -159,28 +159,28 @@ function SmartKS()
             itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
 			if Menu.sKS then
 				if enemy.health <= (qDmg) and GetDistance(enemy) <= qRange and QREADY then
-					if QREADY then CastQ(enemy) end
+					if QREADY then CastSpell(_Q, enemy) end
 				
 				elseif enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then
-					if EREADY then CastE(enemy) end
+					if EREADY then CastSpell(_E, enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg) and GetDistance(enemy) <= eRange and EREADY and QREADY then
-					if EREADY then CastE(enemy) end
-					if QREADY then CastQ(enemy) end
+					if EREADY then CastSpell(_E, enemy) end
+					if QREADY then CastSpell(_Q, enemy) end
 									
 				elseif enemy.health <= (qDmg + itemsDmg) and GetDistance(enemy) <= qRange and QREADY then
 					if DFGREADY then CastSpell(dfgSlot, enemy) end
 					if HXGREADY then CastSpell(hxgSlot, enemy) end
 					if BWCREADY then CastSpell(bwcSlot, enemy) end
 					if BRKREADY then CastSpell(brkSlot, enemy) end
-					if QREADY then CastQ(enemy) end
+					if QREADY then CastSpell(_Q,enemy) end
 				
 				elseif enemy.health <= (eDmg + itemsDmg) and GetDistance(enemy) <= eRange and EREADY then
 					if DFGREADY then CastSpell(dfgSlot, enemy) end
 					if HXGREADY then CastSpell(hxgSlot, enemy) end
 					if BWCREADY then CastSpell(bwcSlot, enemy) end
 					if BRKREADY then CastSpell(brkSlot, enemy) end
-					if EREADY then CastE(enemy) end
+					if EREADY then CastSpell(_E, enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg + itemsDmg) and GetDistance(enemy) <= eRange
 					and EREADY and QREADY then
@@ -188,8 +188,8 @@ function SmartKS()
 						if HXGREADY then CastSpell(hxgSlot, enemy) end
 						if BWCREADY then CastSpell(bwcSlot, enemy) end
 						if BRKREADY then CastSpell(brkSlot, enemy) end
-						if EREADY then CastE(enemy) end
-						if QREADY then CastQ(enemy) end
+						if EREADY then CastSpell(_E, enemy) end
+						if QREADY then CastSpell(_Q, enemy) end
 				end
 								
 				if enemy.health <= iDmg and GetDistance(enemy) <= 600 then
