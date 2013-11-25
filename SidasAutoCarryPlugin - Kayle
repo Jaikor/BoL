@@ -310,17 +310,7 @@ function CountEnemies(point, range)
         end            
 end
 
--- auto ult,
-players = heroManager.iCount
- for i = 1, players, 1 do
-		target = heroManager:getHero(i)
-            if target ~= nil and target.team == player.team and target.visible and not target.dead then
-			  if RREADY and Menu.useR and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or (CountEnemies(target, 500) > 2 and target.health < target.maxHealth*0.4)) then 
-					CastSpell(_R, target)
-			end
-		end
-end
---end of it
+
 
 --[Full Combo with Items]--
 function FullCombo()
@@ -328,6 +318,7 @@ function FullCombo()
 		if AutoCarry.MainMenu.AutoCarry then
 			if GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E) end
+		    if Menu.useR and GetDistance(Target) <= rRange and (Target.health < Target.maxHealth*(Menu.PercentofHealth/100) or CountEnemyHeroInRange(500) > 2 or myHero.health < myHero.maxHealth*0.30) then CastSpell(_R, Target) end
 		end
 	end
 end
