@@ -1,5 +1,5 @@
 --[[
-	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has arrived !!! 1.0 by Jaikor 
+	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.0 by Jaikor 
 	With Code from Skeem
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
@@ -325,7 +325,7 @@ function mainLoad()
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
 	qRange,wRange,eRange,rRange = 650, 900, 525, 900
-	QREADY, WREADY, EREADY, eFlag, RREADY = false, false, false, false, false
+	QREADY, WREADY, EREADY, eFlag = false, false, false, false
 	qName, wName, eName, rName = "Reckoning", "Devine Blessing", "Righteous Fury", "Intervention"
 	HK1, HK2, HK3 = string.byte("Z"), string.byte("K"), string.byte("G")
 	Menu = AutoCarry.PluginMenu
@@ -384,7 +384,6 @@ function Checks()
 	QREADY = (myHero:CanUseSpell(_Q) == READY)
 	WREADY = (myHero:CanUseSpell(_W) == READY)
 	EREADY = (myHero:CanUseSpell(_E) == READY)
-	RREADY = (myHero:CanUseSpell(_R) == READY)
 	DFGREADY = (dfgSlot ~= nil and myHero:CanUseSpell(dfgSlot) == READY)
 	HXGREADY = (hxgSlot ~= nil and myHero:CanUseSpell(hxgSlot) == READY)
 	BWCREADY = (bwcSlot ~= nil and myHero:CanUseSpell(bwcSlot) == READY)
