@@ -1,15 +1,22 @@
 --[[
-	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.0 by Jaikor 
+	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.1 by Jaikor 
 	With Code from Skeem
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
-	Special thanks to Felina for testing the script for me. 
+	Special thanks to Felina, Chrisokgo and gespierd and all the others who help testing the script for me. 
 	Copyright 2013
 	Changelog :
    1.0 - Initial Release
+   1.1 - AA rage fixed for E spell 
+         Auto Ult with Slider % of HP U like make sure that is turn ON or else OFF for manual cast ult
+		 TO DO
+		 Better Logic for Auto Ult I'm working in some more advanced stuff for the ULT of kayle this is just a Basic version hope U guys enjoy it and 
+		 have fun playing with it. post some game score on forum post to motivate people xD 
  ]] --
 
 if myHero.charName ~= "Kayle" then return end
+local rRange = 900
+PrintChat("Kayle Judgement Day Has Come Loaded v1.1")
 
 --[Function When Plugin Loads]--
 function PluginOnLoad()
@@ -28,30 +35,33 @@ function PluginOnTick()
 	Checks()
 	SmartKS()
 	farmMinions:update()
-	if Menu.HealAll then Healing() end
-		if Carry.LaneClear then
-			for _, minion in pairs(AutoCarry.EnemyMinions().objects) do
-					if ValidTarget(minion) and GetDistance(minion) <= eRange and EREADY then
-						CastSpell(_E)
-					end
-				end
-		end
+
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
-	if Menu.qHarass and not IsMyManaLow() and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
+		if Menu.qHarass and not IsMyManaLow() and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
+	end
 	if Carry.LaneClear or JungleClear() then
-				for _, minion in pairs(AutoCarry.EnemyMinions().objects) do
+					for _, minion in pairs(AutoCarry.EnemyMinions().objects) do
 					if ValidTarget(minion) and GetDistance(minion) <= eRange and EREADY then
 						CastSpell(_E)
 					end
 				end
 		end
+	
+	local RREADY = myHero:CanUseSpell(_R) == READY
+	if Menu.useR and RREADY then 
+		for i, ally in ipairs(GetAllyHeroes()) do 
+			if ally and not ally.dead and ally.visible and GetDistance(ally) <= rRange then 
+				UltManagement(ally) 
+			end
+		end
+		UltManagement(myHero)
 	end
+		
 	if Extras.ZWItems and IsMyHealthLow() and Target and (ZNAREADY or WGTREADY) then CastSpell((wgtSlot or znaSlot)) end
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
 	if Extras.aMP and IsMyManaLow() and not (UsingMPot or UsingFlask) and(MPREADY or FSKREADY) then CastSpell((mpSlot or fskSlot)) end
 	if Extras.AutoLevelSkills then autoLevelSetSequence(levelSequence) end
-	
 	  if Extras.qFarm and Carry.LastHit then
 	  for _, minion in pairs(farmMinions.objects) do
 			if minion and ValidTarget(minion) and QREADY and GetDistance(minion) <= qRange then
@@ -65,25 +75,8 @@ end
 function PluginOnDraw()
 	if not myHero.dead then
 		if QREADY and Menu.qDraw then 
-			DrawCircle(myHero.x, myHero.y, myHero.z, eRange, 0x191970)
+			DrawCircle(myHero.x, myHero.y, myHero.z, qRange, 0x191970)
 		end
-		if Menu.cDraw then
-			for i=1, heroManager.iCount do
-			local Unit = heroManager:GetHero(i)
-				if ValidTarget(Unit) then
-					if waittxt[i] == 1 and (KillText[i] ~= nil or 0 or 1) then
-						PrintFloatText(Unit, 0, TextList[KillText[i]])
-					end
-				end
-			if waittxt[i] == 1 then
-				waittxt[i] = 30
-			else
-				waittxt[i] = waittxt[i]-1
-			end
-		end
-		end
-	
-        
 	end
 end
 
@@ -109,6 +102,7 @@ function BonusDamage()
 	end
 	return 0
 end
+
 
 --[Object Detection]--
 function PluginOnCreateObj(obj)
@@ -208,14 +202,15 @@ function Healing()
 			local allytarget = heroManager:GetHero(i)
 			if allytarget.team == myHero.team and not allytarget.dead then 
 				if GetDistance(allytarget) <= 900 and (allytarget.health / allytarget.maxHealth) < Menu.HealHealth then
-					if myHero:CanUseSpell(_E) == READY then 
-						CastSpell(_E, allytarget)
+					if myHero:CanUseSpell(_W) == READY then 
+						CastSpell(_W, allytarget)
 					    end
 					end
 				end
 			end
-			end
+		end
 end
+
 
 
 
@@ -265,8 +260,8 @@ function SmartKS()
 						if HXGREADY then CastSpell(hxgSlot, enemy) end
 						if BWCREADY then CastSpell(bwcSlot, enemy) end
 						if BRKREADY then CastSpell(brkSlot, enemy) end
-						if EREADY then CastSpell(_Q, enemy) end
-						if QREADY then CastSpell(_E, Target) end
+						if QREADY then CastSpell(_Q, enemy) end
+						if EREADY then CastSpell(_E, enemy) end
 						
 				
 				end
@@ -285,19 +280,23 @@ end
 end
 
 
+
+function UltManagement(unit)
+	if unit.health <= unit.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, unit) end
+end
+
+function OnProcessSpell(unit, spell)
+	if Menu.useR and unit.team ~= myHero.team and spell.name == "zedult" then UltManagement(spell.target) end
+end
+
+
 --[Full Combo with Items]--
 function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
 			if GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
 			if GetDistance(Target) <= eRange then CastSpell(_E) end
-			if Menu.useW and WREADY and GetDistance(Target) < wBuffer then
-				if (myHero.health / myHero.maxHealth) < Menu.HealHealth then
-							CastSpell(_W) end
-                end
-			if Menu.useW and WREADY and GetDistance(Target) > wBuffer then
-					CastSpell(_W)
-			end
+		    if Menu.useW and WREADY and GetDistance(Target) > wBuffer then CastSpell(_W, myHero) end
 		end
 	end
 end
@@ -321,7 +320,7 @@ function mainLoad()
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
 	qRange,wRange,eRange,rRange = 650, 900, 525, 900
-	QREADY, WREADY, EREADY, eFlag = false, false, false, false
+	QREADY, WREADY, EREADY, RREADY = false, false, false, false
 	qName, wName, eName, rName = "Reckoning", "Devine Blessing", "Righteous Fury", "Intervention"
 	HK1, HK2, HK3 = string.byte("Z"), string.byte("K"), string.byte("G")
 	Menu = AutoCarry.PluginMenu
@@ -336,7 +335,11 @@ function mainLoad()
 	AdvancedCallback:bind('OnGainBuff', function(unit, buff) OnGainBuff(unit, buff) end)
 	AdvancedCallback:bind('OnLoseBuff', function(unit, buff) OnLoseBuff(unit, buff) end)
 	eBuff = "JudicatorRighteousFury"
-end
+	wBuffer = 400 --Wont use W unless they are this far away. 400 by default.
+	GetEnemyHeroes()
+    GetAllyHeroes()
+end 
+
 
 --[Main Menu & Extras Menu]--
 function mainMenu()
@@ -352,21 +355,20 @@ function mainMenu()
 	Menu:addParam("sep3", "-- Draw Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("qDraw", "Draw "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("cDraw", "Draw Enemy Text", SCRIPT_PARAM_ONOFF, true)
-	Menu:addParam("sep4", "-- Ulti Options --", SCRIPT_PARAM_INFO, "")
+	Menu:addParam("sep4", "-- ULT Options --", SCRIPT_PARAM_INFO, "")
+	Menu:addParam("useR", "Auto Ult "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)
+	Menu:addParam("PercentofHealth", "PercentofHealth",SCRIPT_PARAM_SLICE, 25, 0, 100, 0)
 	Extras = scriptConfig("Sida's Auto Carry Plugin: "..myHero.charName..": Extras", myHero.charName)
 	Extras:addParam("sep5", "-- Misc --", SCRIPT_PARAM_INFO, "")
-	Extras:addParam("qFarm", "Use Q farm"..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
-	Extras:addParam("JungleE", "Jungle with"..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
+	Extras:addParam("qFarm", "Last Hit with "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
+	Extras:addParam("JungleE", "Jungle with "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("MinMana", "Minimum Mana for Jungle/Harass %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("ZWItems", "Auto Zhonyas/Wooglets", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("ZWHealth", "Min Health % for Zhonyas/Wooglets", SCRIPT_PARAM_SLICE, 15, 0, 100, -1)
 	Extras:addParam("aHP", "Auto Health Pots", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("aMP", "Auto Auto Mana Pots", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("HPHealth", "Min % for Health Pots", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
-	AutoCarry.Plugins:RegisterBonusLastHitDamage(BonusDamage)
 end
-
-
 
 --[Certain Checks]--
 function Checks()
@@ -380,6 +382,7 @@ function Checks()
 	QREADY = (myHero:CanUseSpell(_Q) == READY)
 	WREADY = (myHero:CanUseSpell(_W) == READY)
 	EREADY = (myHero:CanUseSpell(_E) == READY)
+	RREADY = (myHero:CanUseSpell(_R) == READY)
 	DFGREADY = (dfgSlot ~= nil and myHero:CanUseSpell(dfgSlot) == READY)
 	HXGREADY = (hxgSlot ~= nil and myHero:CanUseSpell(hxgSlot) == READY)
 	BWCREADY = (bwcSlot ~= nil and myHero:CanUseSpell(bwcSlot) == READY)
