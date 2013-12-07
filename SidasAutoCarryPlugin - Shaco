@@ -230,9 +230,9 @@ end
 function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
-		    if GetDistance(Target) <= qRange then CastSpell(_Q, Target.x, Target.z) end
-			if GetDistance(Target) <= wRange then CastW(Target) end
-			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
+		    if Menu.useQ and GetDistance(Target) <= qRange then CastSpell(_Q, Target.x, Target.z) end
+			if Menu.useW and GetDistance(Target) <= wRange then CastW(Target) end
+			if Menu.useE and GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
 			if Menu.useR and GetDistance(Target) <= rRange and (Target.health < Target.maxHealth*(Menu.PercentofHealth/100) or CountEnemyHeroInRange(500) > 2 or myHero.health < myHero.maxHealth*0.25) then CastSpell(_R) end
 		end
 	end
