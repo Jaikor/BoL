@@ -1,7 +1,7 @@
 --[[
-	AutoCarry Plugin - Poppy The Iron Ambassador 1.0 by Jaikor 
-	With Code (script) from HeX ( This is his work I just updated it a bit with his permission and Updated it)
-	All credit goes to HeX.
+	AutoCarry Plugin - Shaco The Iron Ambassador 1.0 by Jaikor 
+	With Code from HeX ( This is his work I just updated it a bit with his permission and Updated it)
+	All credit goes Basicly to HeX.
 	Credit to Skeem for his codes too xD
 	HP Code from Kain 
 	I'm Still learning so don't be hard.
@@ -249,9 +249,9 @@ end
 function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
-		    if GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
-			if GetDistance(Target) <= wRange then CastSpell(_W, Target) end
-			if GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
+		    if Menu.useQ and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
+			if Menu.useW and GetDistance(Target) <= wRange then CastSpell(_W, Target) end
+			if Menu.useE and GetDistance(Target) <= eRange then CastSpell(_E, Target) end 
 			if Menu.useR and GetDistance(Target) <= rRange and (Target.health < Target.maxHealth*(Menu.PercentofHealth/100) or CountEnemyHeroInRange(500) > 2 or myHero.health < myHero.maxHealth*0.25) then CastSpell(_R, Target) end
 		end
 	end
@@ -298,11 +298,11 @@ function mainMenu()
 	Menu:permaShow("autoStun")
 	Menu:addParam("sep2", "-- Mixed Mode Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("qHarass", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
-  Menu:addParam("sep3", "-- KS Options --", SCRIPT_PARAM_INFO, "")
+    Menu:addParam("sep3", "-- KS Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("sKS", "Use Smart Combo KS", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("sep4", "-- Draw Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("eDraw", "Draw "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
-  Menu:addParam("rDraw", "Draw "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)   
+    Menu:addParam("rDraw", "Draw "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)   
 	Menu:addParam("cDraw", "Draw Enemy Text", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("sep5", "-- Ulti Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("useR", "Use "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)
