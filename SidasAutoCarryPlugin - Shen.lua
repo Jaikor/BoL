@@ -1,20 +1,29 @@
 --[[
-	AutoCarry Plugin - Shen Eye of Twilight 1.0 by Jaikor 
+	AutoCarry Plugin - Shen Eye of Twilight 2.0 by Jaikor 
 	With Code from Skeem
 	Credtis to HeX helping me allot with the Ulti of shen
 	Auto Level from Dekaron.
-	I'm Still learning so don't be hard.
+	Credits BotHappy helping me with PROdiction
+	Credits pqmailer ult breaker mode
+
 	Copyright 2013
 	Changelog :
    1.0 - Initial Release
  ]] --
 
-if myHero.charName ~= "Shen" then return end
+ if myHero.charName ~= "Shen" then return end
+require 'Prodiction'
+local rRange = 18500
 
 --[Function When Plugin Loads]--
 function PluginOnLoad()
 	mainLoad() -- Loads our Variable Function
 	mainMenu() -- Loads our Menu function
+   if IsSACReborn and VIP_USER then
+   SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, true)
+else
+ 	SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
+end
 end
 
 --[OnTick]--
@@ -34,6 +43,15 @@ function PluginOnTick()
 		if Menu.qHarass and not IsMyManaLow() and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
 	end
 	if Carry.LaneClear then JungleClear() end
+	
+	local RREADY = myHero:CanUseSpell(_R) == READY
+	if Menu.useR and RREADY then 
+		for i, ally in ipairs(GetAllyHeroes()) do 
+			if ally and not ally.dead and ally.visible and GetDistance(ally) <= rRange then 
+				UltManagement(ally) 
+			end
+		end
+	end
 	
 	if Extras.ZWItems and IsMyHealthLow() and Target and (ZNAREADY or WGTREADY) then CastSpell((wgtSlot or znaSlot)) end
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
@@ -55,13 +73,6 @@ function PluginOnDraw()
 			DrawCircle(myHero.x, myHero.y, myHero.z, qRange, 0x191970)
 		end
 	end
-end
-
---[Casting our E into Enemies]--
-function CastE(Target)
-    if EREADY then 
-		AutoCarry.CastSkillshot(SkillE, Target)
-    end
 end
 
 
@@ -114,16 +125,6 @@ function OnAttacked()
 	end
 end
 
---[Low Mana Function by Kain]--
-function IsMyManaLow()
-    if myHero.mana < (myHero.maxMana * ( Extras.MinMana / 100)) then
-        return true
-    else
-        return false
-    end
-end
-
---[/Low Mana Function by Kain]--
 
 --[Low Health Function Trololz]--
 function IsMyHealthLow()
@@ -144,11 +145,13 @@ function NeedHP()
 	end
 end
 
+
+
 function CountEnemies(point, range)
         local ChampCount = 0
         for j = 1, heroManager.iCount, 1 do
                 local enemyhero = heroManager:getHero(j)
-                if myHero.team ~= enemyhero.team and ValidTarget(enemyhero, QRange) then
+                if myHero.team ~= enemyhero.team and ValidTarget(enemyhero, qRange) then
                         if GetDistance(enemyhero, point) <= range then
                                 ChampCount = ChampCount + 1
                         end
@@ -156,6 +159,8 @@ function CountEnemies(point, range)
         end            
         return ChampCount
 end
+
+
 
 --[Smart KS Function]--
 function SmartKS()
@@ -234,28 +239,38 @@ function CountEnemies(point, range)
         end            
 end
 
--- auto ult,
-players = heroManager.iCount
- for i = 1, players, 1 do
-		target = heroManager:getHero(i)
-		if target ~= nil and target.team == player.team and target.visible and not target.dead then
-			  if RREADY and Menu.useR and (target.health < target.maxHealth*(Menu.PercentofHealth/100) or (CountEnemies(target, 500) > 2 and target.health < target.maxHealth*0.4)) then 
-					CastSpell(_R, target)
-			end
-		end
+
+function OnAttacked()
+   if Target ~= nil and AutoCarry.AutoCarry then CastSpell(_W) end
 end
---end of it
+
+function UltManagement(unit)
+	if unit.health <= unit.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, unit) end
+end
+
+
+--[Casting our E into Enemies]--
+function CastE(Target)
+ if IsSACReborn and VIP_USER then
+    if EREADY then
+     SkillE:Cast(Target) end
+    if EREADY then 
+		AutoCarry.CastSkillshot(SkillE, Target)
+    end
+end
+end
 
 --[Full Combo with Items]--
 function FullCombo()
-	if Target then
-		if AutoCarry.MainMenu.AutoCarry then
-			if GetDistance(Target) <= eRange then CastSpell(_E, Target.x, Target.z)
-			if GetDistance(Target) <= wRange then CastSpell(_W) end
-			if GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
-		end
-	end
-end
+ if Target then
+  if AutoCarry.MainMenu.AutoCarry then
+   if QREADY and GetDistance(Target) <= qRange then 
+    CastSpell(_Q, Target)
+   elseif EREADY and GetDistance(Target) <= eRange then
+    CastE(Target) 
+   end
+  end
+ end
 end
 
 function JungleClear()
@@ -275,7 +290,7 @@ function mainLoad()
 	if AutoCarry.Skills then IsSACReborn = true else IsSACReborn = false end
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
-	qRange,wRange,eRange,rRange = 475, 600, 600, 25000
+	qRange,wRange,eRange,rRange = 475, 600, 600, 18500
 	QREADY, WREADY, EREADY, RREADY = false, false, false, false
 	qName, wName, eName, rName = "Vorpal Blade", "Feint", "Shadow Dash", "Stand United"
 	HK1, HK2, HK3 = string.byte("Z"), string.byte("K"), string.byte("G")
@@ -286,9 +301,50 @@ function mainLoad()
 	KillText = {}
 	waittxt = {} -- prevents UI lags, all credits to Dekaron
 	for i=1, heroManager.iCount do waittxt[i] = i*3 end -- All credits to Dekaron
-	levelSequence = { 1, 2, 3, 1, 1, 4, 1, 1, 2, 2, 4, 2, 2, 3, 3, 4, 3, 3, }
+	levelSequence = {nil, 2, 3, 1, 1, 4, 1, 1, 2, 2, 4, 2, 2, 3, 3, 4, 3, 3}
 	SkillE = {spellKey = _E, range = rRange, speed = eSpeed, delay = eDelay, width = eWidth, configName = eName, displayName = "E "..eName.."", enabled = true, skillShot = true, minions = false, reset = false, reqTarget = false }
 	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
+	enemyHeroes = GetEnemyHeroes()
+	GetEnemyHeroes()
+    GetAllyHeroes()
+	ToInterrupt = {}
+	InterruptList = {
+    { charName = "Caitlyn", spellName = "CaitlynAceintheHole"},
+    { charName = "FiddleSticks", spellName = "Crowstorm"},
+    { charName = "FiddleSticks", spellName = "DrainChannel"},
+    { charName = "Galio", spellName = "GalioIdolOfDurand"},
+    { charName = "Karthus", spellName = "FallenOne"},
+    { charName = "Katarina", spellName = "KatarinaR"},
+    { charName = "Malzahar", spellName = "AlZaharNetherGrasp"},
+    { charName = "MissFortune", spellName = "MissFortuneBulletTime"},
+    { charName = "Nunu", spellName = "AbsoluteZero"},
+    { charName = "Pantheon", spellName = "Pantheon_GrandSkyfall_Jump"},
+    { charName = "Shen", spellName = "ShenStandUnited"},
+    { charName = "Urgot", spellName = "UrgotSwap2"},
+    { charName = "Varus", spellName = "VarusQ"},
+    { charName = "Warwick", spellName = "InfiniteDuress"}
+}
+
+	for _, enemy in pairs(enemyHeroes) do
+		for _, champ in pairs(InterruptList) do
+			if enemy.charName == champ.charName then
+				table.insert(ToInterrupt, champ.spellName)
+			end
+		end
+	end
+end
+
+function OnProcessSpell(unit, spell)
+	if #ToInterrupt > 0 and Extras.interrupt and EREADY then
+		for _, ability in pairs(ToInterrupt) do
+			if spell.name == ability and unit.team ~= myHero.team then
+				if eRange >= GetDistance(unit) then
+					CastSpell(_E, EPos.x, EPos.z)
+					if Config.printInterrupt then print("Tried to interrupt " .. spell.name) end
+				end
+			end
+		end
+	end
 end
 
 --[Main Menu & Extras Menu]--
@@ -307,15 +363,15 @@ function mainMenu()
 	Menu:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras = scriptConfig("Sida's Auto Carry Plugin: "..myHero.charName..": Extras", myHero.charName)
 	Extras:addParam("sep5", "-- Misc --", SCRIPT_PARAM_INFO, "")
-	Extras:addParam("qFarm", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
+	Extras:addParam("qFarm", "Use Q LastHit "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
 	Extras:addParam("JungleQ", "Jungle with "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
-	Extras:addParam("MinMana", "Minimum Mana for Jungle/Harass %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("ZWItems", "Auto Zhonyas/Wooglets", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("ZWHealth", "Min Health % for Zhonyas/Wooglets", SCRIPT_PARAM_SLICE, 15, 0, 100, -1)
 	Extras:addParam("aHP", "Auto Health Pots", SCRIPT_PARAM_ONOFF, true)
-	Extras:addParam("aMP", "Auto Auto Mana Pots", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("HPHealth", "Min % for Health Pots", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("AutoLevelSkills", "Auto Level Skills (Requires Reload)", SCRIPT_PARAM_ONOFF, true)
+	Extras:addParam("sep6", "-- Ult Breaker --", SCRIPT_PARAM_INFO, "")
+	Extras:addParam("interrupt", "Interrupt with E", SCRIPT_PARAM_ONOFF, true)
 end
 
 --[Certain Checks]--
