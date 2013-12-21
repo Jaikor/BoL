@@ -251,13 +251,14 @@ end
 
 --[Casting our E into Enemies]--
 function CastE(Target)
- if IsSACReborn and VIP_USER then
-    if EREADY then
-     SkillE:Cast(Target) end
-    if EREADY then 
+	if IsSACReborn and VIP_USER then
+		if EREADY then
+			SkillE:Cast(Target)
+		end
+	end
+	if EREADY then 
 		AutoCarry.CastSkillshot(SkillE, Target)
-    end
-end
+	end
 end
 
 --[Full Combo with Items]--
@@ -339,7 +340,7 @@ function OnProcessSpell(unit, spell)
 		for _, ability in pairs(ToInterrupt) do
 			if spell.name == ability and unit.team ~= myHero.team then
 				if eRange >= GetDistance(unit) then
-					CastSpell(_E, EPos.x, EPos.z)
+					CastSpell(_E, unit)
 					if Config.printInterrupt then print("Tried to interrupt " .. spell.name) end
 				end
 			end
