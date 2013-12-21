@@ -252,12 +252,13 @@ end
 --[Casting our E into Enemies]--
 function CastE(Target)
  if IsSACReborn and VIP_USER then
-    if EREADY then
-     SkillE:Cast(Target) end
+  if EREADY then
+   SkillE:Cast(Target)
+  end
+ end
     if EREADY then 
-		AutoCarry.CastSkillshot(SkillE, Target)
+  AutoCarry.CastSkillshot(SkillE, Target)
     end
-end
 end
 
 --[Full Combo with Items]--
