@@ -1,5 +1,5 @@
 --[[
-	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.1 by Jaikor 
+	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.0 by Jaikor 
 	With Code from Skeem
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
@@ -7,16 +7,10 @@
 	Copyright 2013
 	Changelog :
    1.0 - Initial Release
-   1.1 - AA rage fixed for E spell 
-         Auto Ult with Slider % of HP U like make sure that is turn ON or else OFF for manual cast ult
-		 TO DO
-		 Better Logic for Auto Ult I'm working in some more advanced stuff for the ULT of kayle this is just a Basic version hope U guys enjoy it and 
-		 have fun playing with it. post some game score on forum post to motivate people xD 
  ]] --
 
 if myHero.charName ~= "Kayle" then return end
 local rRange = 900
-PrintChat("Kayle Judgement Day Has Come Loaded v1.1")
 
 --[Function When Plugin Loads]--
 function PluginOnLoad()
@@ -42,7 +36,7 @@ function PluginOnTick()
 	end
 	if Carry.LaneClear or JungleClear() then
 					for _, minion in pairs(AutoCarry.EnemyMinions().objects) do
-					if ValidTarget(minion) and GetDistance(minion) <= eRange and EREADY then
+					if ValidTarget(minion) and GetDistance(minion) <= eRange and Extras.useEclear and EREADY then
 						CastSpell(_E)
 					end
 				end
@@ -362,6 +356,7 @@ function mainMenu()
 	Extras:addParam("sep5", "-- Misc --", SCRIPT_PARAM_INFO, "")
 	Extras:addParam("qFarm", "Last Hit with "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
 	Extras:addParam("JungleE", "Jungle with "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
+	Extras:addParam("useEclear", "Lane Clear with E "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("MinMana", "Minimum Mana for Jungle/Harass %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("ZWItems", "Auto Zhonyas/Wooglets", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("ZWHealth", "Min Health % for Zhonyas/Wooglets", SCRIPT_PARAM_SLICE, 15, 0, 100, -1)
