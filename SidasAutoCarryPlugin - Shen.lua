@@ -339,7 +339,7 @@ function OnProcessSpell(unit, spell)
 		for _, ability in pairs(ToInterrupt) do
 			if spell.name == ability and unit.team ~= myHero.team then
 				if eRange >= GetDistance(unit) then
-					CastSpell(_E, EPos.x, EPos.z)
+					CastE(unit)
 					if Config.printInterrupt then print("Tried to interrupt " .. spell.name) end
 				end
 			end
