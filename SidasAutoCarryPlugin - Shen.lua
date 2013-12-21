@@ -5,6 +5,7 @@
 	Auto Level from Dekaron.
 	Credits BotHappy helping me with PROdiction
 	Credits pqmailer ult breaker mode
+	Thanks to Roachxd for the tip on the E prediction for free users
 
 	Copyright 2013
 	Changelog :
