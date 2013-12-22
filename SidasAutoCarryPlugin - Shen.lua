@@ -12,19 +12,23 @@
    1.0 - Initial Release
  ]] --
 
- if myHero.charName ~= "Shen" then return end
-require 'Prodiction'
+if myHero.charName ~= "Shen" then return end
+
+if VIP_USER then
+	require 'Prodiction'
+end
+
 local rRange = 18500
 
 --[Function When Plugin Loads]--
 function PluginOnLoad()
 	mainLoad() -- Loads our Variable Function
 	mainMenu() -- Loads our Menu function
-   if IsSACReborn and VIP_USER then
-   SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, true)
-else
- 	SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
-end
+	if IsSACReborn and VIP_USER then
+		SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, true)
+	else
+		SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
+	end
 end
 
 --[OnTick]--
