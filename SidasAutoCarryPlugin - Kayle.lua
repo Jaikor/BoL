@@ -1,5 +1,5 @@
 --[[
-	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.0 by Jaikor 
+	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.1 by Jaikor 
 	With Code from Skeem
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
