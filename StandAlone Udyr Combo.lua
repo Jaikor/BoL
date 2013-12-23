@@ -1,6 +1,6 @@
 --[[
 Script - Udyr -The Animal Spirit - Combo
-                 Improved by Jaikor
+                 by Jaikor
 
 		Features:
 			- Full Combo:
@@ -73,7 +73,7 @@ function OnLoad()
 	UdyrConfig:addParam("moveToMouse", "Move to Mouse", SCRIPT_PARAM_ONOFF, false)
 	UdyrConfig:permaShow("Combo")
 	UdyrConfig:permaShow("StunCycle")
-	UdyrConfig:permaShow("JungleClear")
+
 			
 	ts = TargetSelector(TARGET_LOW_HP_PRIORITY, 600, DAMAGE_PHYSICAL, true)
     ts.name = "Udyr"
@@ -95,7 +95,12 @@ function OnTick()
 	EREADY = (myHero:CanUseSpell(_E) == READY)
 	RREADY = (myHero:CanUseSpell(_R) == READY)
 	IREADY = (ignite ~= nil and myHero:CanUseSpell(ignite) == READY)
-	
+
+--[[	
+	JungleKey =  UdyrConfig.JungleClear
+	if JungleKey then JungleClear() end
+]]--
+
 
 	--[[ Move to Mouse ]]--
 	if UdyrConfig.moveToMouse and ts.target == nil and UdyrConfig.Combo then
@@ -286,9 +291,30 @@ function OnTick()
 			myHero:Attack(stunTarget)
 		end
 	end
-
+	
+--[[
+	-- Jungle Farming --
+	function JungleClear()
+	local JungleMob = GetJungleMobs()
+    if JungleMob ~= nil then
+ 		if (myHero:GetSpellData(_Q).level >= 1 or myHero:GetSpellData(_R).level >= 1) and myHero:GetSpellData(_W).level == 0 and myHero:GetSpellData(_E).level == 0 then
+	    if QREADY and AAcount >= 0 then CastSpell(_Q, JungleMob) AAcount = 0 end
+		if RREADY and AAcount >= 1 then CastSpell(_R, JungleMob) AAcount = 0 end
+			OrbWalk()
+		end
+    myHero:Attack(JungleMob)
+    end
+    end
+]]--	
 end
 
+-- Get Jungle Mob --
+function GetJungleMobs()
+        return {"Dragon6.1.1", "Worm12.1.1", "GiantWolf8.1.3", "wolf8.1.1", "wolf8.1.2", "AncientGolem7.1.1", "YoungLizard7.1.2", "YoungLizard7.1.3", "Wraith9.1.3", "LesserWraith9.1.1", "LesserWraith9.1.2",
+        "LesserWraith9.1.4", "LizardElder10.1.1", "YoungLizard10.1.2", "YoungLizard10.1.3", "Golem11.1.2", "SmallGolem11.1.1", "GiantWolf2.1.3", "wolf2.1.1",
+        "wolf2.1.2", "AncientGolem1.1.1", "YoungLizard1.1.2", "YoungLizard1.1.3", "Wraith3.1.3", "LesserWraith3.1.1", "LesserWraith3.1.2", "LesserWraith3.1.4",
+        "LizardElder4.1.1", "YoungLizard4.1.2", "YoungLizard4.1.3", "Golem5.1.2", "SmallGolem5.1.1"}
+end
 
 function OrbWalk()
 	if not TargetHaveBuff("udyrbearstuncheck", ts.target) then
