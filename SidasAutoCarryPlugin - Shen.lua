@@ -12,32 +12,28 @@
    1.0 - Initial Release
  ]] --
 
-if myHero.charName ~= "Shen" then return end
-
-if VIP_USER then
-	require 'Prodiction'
-end
-
+ if myHero.charName ~= "Shen" then return end
+require 'Prodiction'
 local rRange = 18500
 
 --[Function When Plugin Loads]--
 function PluginOnLoad()
 	mainLoad() -- Loads our Variable Function
 	mainMenu() -- Loads our Menu function
-	if IsSACReborn and VIP_USER then
-		SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, true)
-	else
-		SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
-	end
+   if IsSACReborn and VIP_USER then
+   SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, true)
+else
+ 	SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
+end
 end
 
 --[OnTick]--
 function PluginOnTick()
 	if Recall then return end
 	if IsSACReborn then
-		AutoCarry.Crosshair:SetSkillCrosshairRange(25000)
+		AutoCarry.Crosshair:SetSkillCrosshairRange(18500)
 	else
-		AutoCarry.SkillsCrosshair.range = 25000
+		AutoCarry.SkillsCrosshair.range = 18500
 	end
 	Checks()
 	SmartKS()
@@ -124,11 +120,6 @@ function PluginOnDeleteObj(obj)
 	end
 end
 
-function OnAttacked()
-	if Target and Carry.AutoCarry then
-		if QREADY and Menu.useQ and GetDistance(Target) <= qRange then CastSpell(_Q, Target) end
-	end
-end
 
 
 --[Low Health Function Trololz]--
@@ -249,6 +240,7 @@ function OnAttacked()
    if Target ~= nil and AutoCarry.AutoCarry then CastSpell(_W) end
 end
 
+
 function UltManagement(unit)
 	if unit.health <= unit.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, unit) end
 end
@@ -256,14 +248,13 @@ end
 
 --[Casting our E into Enemies]--
 function CastE(Target)
- if IsSACReborn and VIP_USER then
-  if EREADY then
+ if EREADY then
+  if IsSACReborn and VIP_USER then
    SkillE:Cast(Target)
+  else
+   AutoCarry.CastSkillshot(SkillE, Target)
   end
  end
-    if EREADY then 
-  AutoCarry.CastSkillshot(SkillE, Target)
-    end
 end
 
 --[Full Combo with Items]--
@@ -308,7 +299,6 @@ function mainLoad()
 	waittxt = {} -- prevents UI lags, all credits to Dekaron
 	for i=1, heroManager.iCount do waittxt[i] = i*3 end -- All credits to Dekaron
 	levelSequence = {nil, 2, 3, 1, 1, 4, 1, 1, 2, 2, 4, 2, 2, 3, 3, 4, 3, 3}
-	SkillE = {spellKey = _E, range = rRange, speed = eSpeed, delay = eDelay, width = eWidth, configName = eName, displayName = "E "..eName.."", enabled = true, skillShot = true, minions = false, reset = false, reqTarget = false }
 	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
 	enemyHeroes = GetEnemyHeroes()
 	GetEnemyHeroes()
