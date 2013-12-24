@@ -13,18 +13,22 @@
  ]] --
 
  if myHero.charName ~= "Shen" then return end
+ --[[
 require 'Prodiction'
+]]--
 local rRange = 18500
 
 --[Function When Plugin Loads]--
 function PluginOnLoad()
 	mainLoad() -- Loads our Variable Function
 	mainMenu() -- Loads our Menu function
+	--[[
    if IsSACReborn and VIP_USER then
-   SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, true)
+   SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, false)
 else
  	SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
 end
+]]--
 end
 
 --[OnTick]--
@@ -54,9 +58,7 @@ function PluginOnTick()
 		end
 	end
 	
-	if Extras.ZWItems and IsMyHealthLow() and Target and (ZNAREADY or WGTREADY) then CastSpell((wgtSlot or znaSlot)) end
 	if Extras.aHP and NeedHP() and not (UsingHPot or UsingFlask) and (HPREADY or FSKREADY) then CastSpell((hpSlot or fskSlot)) end
-	if Extras.aMP and IsMyManaLow() and not (UsingMPot or UsingFlask) and(MPREADY or FSKREADY) then CastSpell((mpSlot or fskSlot)) end
 	if Extras.AutoLevelSkills then autoLevelSetSequence(levelSequence) end
 	if Extras.qFarm and Carry.LastHit then
 	  for _, minion in pairs(farmMinions.objects) do
@@ -141,6 +143,15 @@ function NeedHP()
 	end
 end
 
+--[Low Mana Function by Kain]--
+function IsMyManaLow()
+    if myHero.mana < (myHero.maxMana * ( Extras.MinMana / 100)) then
+        return true
+    else
+        return false
+    end
+end
+
 
 
 function CountEnemies(point, range)
@@ -175,14 +186,14 @@ function SmartKS()
             itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
 			if Menu.sKS then
 				if enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then
-					if EREADY then CastE(enemy) end
+					if EREADY then CastSpell(_E,enemy) end
 				
 				elseif enemy.health <= (qDmg) and GetDistance(enemy) <= qRange and QREADY then
 					if QREADY then CastSpell(_Q, enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg) and GetDistance(enemy) <= eRange and EREADY and QREADY then
 					if QREADY then CastSpell(_Q, enemy)
-					if EREADY then CastE(enemy) end
+					if EREADY then CastSpell(_E,enemy) end
 									
 				elseif enemy.health <= (qDmg + itemsDmg) and GetDistance(enemy) <= qRange and QREADY then
 					if DFGREADY then CastSpell(dfgSlot, enemy) end
@@ -196,7 +207,7 @@ function SmartKS()
 					if HXGREADY then CastSpell(hxgSlot, enemy) end
 					if BWCREADY then CastSpell(bwcSlot, enemy) end
 					if BRKREADY then CastSpell(brkSlot, enemy) end
-					if EREADY then CastE(enemy) end
+					if EREADY then CastSpell(_E,enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg + itemsDmg) and GetDistance(enemy) <= eRange
 					and EREADY and QREADY then
@@ -204,7 +215,7 @@ function SmartKS()
 						if HXGREADY then CastSpell(hxgSlot, enemy) end
 						if BWCREADY then CastSpell(bwcSlot, enemy) end
 						if BRKREADY then CastSpell(brkSlot, enemy) end
-						if EREADY then CastE(enemy) end
+						if EREADY then CastSpell(_E,enemy) end
 						if QREADY then CastSpell(_Q, Target) end
 						
 				
@@ -246,16 +257,18 @@ function UltManagement(unit)
 end
 
 
+--[[
 --[Casting our E into Enemies]--
 function CastE(Target)
- if EREADY then
-  if IsSACReborn and VIP_USER then
-   SkillE:Cast(Target)
-  else
-   AutoCarry.CastSkillshot(SkillE, Target)
-  end
- end
+ if IsSACReborn and VIP_USER then
+    if EREADY then
+     SkillE:Cast(Target) end
+    if EREADY then 
+		AutoCarry.CastSkillshot(SkillE, Target)
+    end
 end
+end
+]]--
 
 --[Full Combo with Items]--
 function FullCombo()
@@ -264,8 +277,8 @@ function FullCombo()
    if QREADY and GetDistance(Target) <= qRange then 
     CastSpell(_Q, Target)
    elseif EREADY and GetDistance(Target) <= eRange then
-    CastE(Target) 
-   end
+    CastSpell(_E, Target.x,Target.z)
+	end
   end
  end
 end
@@ -335,8 +348,8 @@ function OnProcessSpell(unit, spell)
 		for _, ability in pairs(ToInterrupt) do
 			if spell.name == ability and unit.team ~= myHero.team then
 				if eRange >= GetDistance(unit) then
-					CastE(unit)
-					if Config.printInterrupt then print("Tried to interrupt " .. spell.name) end
+					CastSpell(_E, Target.x,Target.z)
+					if Extras.interrupt then print("Tried to interrupt " .. spell.name) end
 				end
 			end
 		end
@@ -357,13 +370,13 @@ function mainMenu()
 	Menu:addParam("sep4", "-- Ulti Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("useR", "Use "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
-	Extras:addParam("AutoLevelSkills", "Auto Level Skills (Requires Reload)", SCRIPT_PARAM_ONOFF, true)
 	Extras = scriptConfig("Sida's Auto Carry Plugin: "..myHero.charName..": Extras", myHero.charName)
 	Extras:addParam("sep5", "-- Misc --", SCRIPT_PARAM_INFO, "")
 	Extras:addParam("qFarm", "Use Q LastHit "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)	
 	Extras:addParam("JungleQ", "Jungle with "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("ZWItems", "Auto Zhonyas/Wooglets", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("ZWHealth", "Min Health % for Zhonyas/Wooglets", SCRIPT_PARAM_SLICE, 15, 0, 100, -1)
+	Extras:addParam("MinMana", "Minimum Mana for Jungle/Harass %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("aHP", "Auto Health Pots", SCRIPT_PARAM_ONOFF, true)
 	Extras:addParam("HPHealth", "Min % for Health Pots", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 	Extras:addParam("AutoLevelSkills", "Auto Level Skills (Requires Reload)", SCRIPT_PARAM_ONOFF, true)
