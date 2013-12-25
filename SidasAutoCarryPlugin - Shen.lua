@@ -11,24 +11,29 @@
 	Changelog :
    1.0 - Initial Release
  ]] --
+ 
+if VIP_USER then
+	require 'Prodiction'
+end
 
- if myHero.charName ~= "Shen" then return end
- --[[
-require 'Prodiction'
-]]--
+--[Are you Shen?]--
+if myHero.charName ~= "Shen" then return end
+
+--[Variables]--
 local rRange = 18500
+local Prodict, ProdictE
 
 --[Function When Plugin Loads]--
 function PluginOnLoad()
 	mainLoad() -- Loads our Variable Function
 	mainMenu() -- Loads our Menu function
-	--[[
-   if IsSACReborn and VIP_USER then
-   SkillE = AutoCarry.Skills:NewSkill(false, _E, 600, "Shadow Dash", AutoCarry.SPELL_LINEAR, 0, false, false, 0.3, 800, 50, false)
-else
- 	SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
-end
-]]--
+	
+	if VIP_USER then
+		Prodict = ProdictManager.GetInstance()
+		ProdictE = Prodict:AddProdictionObject(_E, 600, 800, 0.3, 50, myHero)
+	else
+		SkillE = {spellKey = _E, range = 600, speed = 800, delay = 0.3}
+	end
 end
 
 --[OnTick]--
@@ -64,7 +69,7 @@ function PluginOnTick()
 	  for _, minion in pairs(farmMinions.objects) do
 			if minion and ValidTarget(minion) and QREADY and GetDistance(minion) <= qRange then
 				if minion.health < qDmg then CastSpell(_Q, minion) end
-            end 
+			end 
 		end
 	end
 end
@@ -145,26 +150,26 @@ end
 
 --[Low Mana Function by Kain]--
 function IsMyManaLow()
-    if myHero.mana < (myHero.maxMana * ( Extras.MinMana / 100)) then
-        return true
-    else
-        return false
-    end
+	if myHero.mana < (myHero.maxMana * ( Extras.MinMana / 100)) then
+		return true
+	else
+		return false
+	end
 end
 
 
 
 function CountEnemies(point, range)
-        local ChampCount = 0
-        for j = 1, heroManager.iCount, 1 do
-                local enemyhero = heroManager:getHero(j)
-                if myHero.team ~= enemyhero.team and ValidTarget(enemyhero, qRange) then
-                        if GetDistance(enemyhero, point) <= range then
-                                ChampCount = ChampCount + 1
-                        end
-                end
-        end            
-        return ChampCount
+		local ChampCount = 0
+		for j = 1, heroManager.iCount, 1 do
+				local enemyhero = heroManager:getHero(j)
+				if myHero.team ~= enemyhero.team and ValidTarget(enemyhero, qRange) then
+						if GetDistance(enemyhero, point) <= range then
+								ChampCount = ChampCount + 1
+						end
+				end
+		end			
+		return ChampCount
 end
 
 
@@ -173,27 +178,27 @@ end
 function SmartKS()
 	for i=1, heroManager.iCount do
 	 local enemy = heroManager:GetHero(i)
-	    if ValidTarget(enemy) then
+		if ValidTarget(enemy) then
 			dfgDmg, hxgDmg, bwcDmg, iDmg  = 0, 0, 0, 0
 			qDmg = getDmg("Q",enemy,myHero)
-            eDmg = getDmg("E",enemy,myHero)
+			eDmg = getDmg("E",enemy,myHero)
 			wDmg = getDmg("W",enemy,myHero)
 			if DFGREADY then dfgDmg = (dfgSlot and getDmg("DFG",enemy,myHero) or 0)	end
-            if HXGREADY then hxgDmg = (hxgSlot and getDmg("HXG",enemy,myHero) or 0) end
-            if BWCREADY then bwcDmg = (bwcSlot and getDmg("BWC",enemy,myHero) or 0) end
-            if IREADY then iDmg = (ignite and getDmg("IGNITE",enemy,myHero) or 0) end
-            onspellDmg = (liandrysSlot and getDmg("LIANDRYS",enemy,myHero) or 0)+(blackfireSlot and getDmg("BLACKFIRE",enemy,myHero) or 0)
-            itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
+			if HXGREADY then hxgDmg = (hxgSlot and getDmg("HXG",enemy,myHero) or 0) end
+			if BWCREADY then bwcDmg = (bwcSlot and getDmg("BWC",enemy,myHero) or 0) end
+			if IREADY then iDmg = (ignite and getDmg("IGNITE",enemy,myHero) or 0) end
+			onspellDmg = (liandrysSlot and getDmg("LIANDRYS",enemy,myHero) or 0)+(blackfireSlot and getDmg("BLACKFIRE",enemy,myHero) or 0)
+			itemsDmg = dfgDmg + hxgDmg + bwcDmg + iDmg + onspellDmg
 			if Menu.sKS then
 				if enemy.health <= (eDmg) and GetDistance(enemy) <= eRange and EREADY then
-					if EREADY then CastSpell(_E,enemy) end
+					if EREADY then CastE(enemy) end
 				
 				elseif enemy.health <= (qDmg) and GetDistance(enemy) <= qRange and QREADY then
 					if QREADY then CastSpell(_Q, enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg) and GetDistance(enemy) <= eRange and EREADY and QREADY then
 					if QREADY then CastSpell(_Q, enemy)
-					if EREADY then CastSpell(_E,enemy) end
+					if EREADY then CastE(enemy) end
 									
 				elseif enemy.health <= (qDmg + itemsDmg) and GetDistance(enemy) <= qRange and QREADY then
 					if DFGREADY then CastSpell(dfgSlot, enemy) end
@@ -207,7 +212,7 @@ function SmartKS()
 					if HXGREADY then CastSpell(hxgSlot, enemy) end
 					if BWCREADY then CastSpell(bwcSlot, enemy) end
 					if BRKREADY then CastSpell(brkSlot, enemy) end
-					if EREADY then CastSpell(_E,enemy) end
+					if EREADY then CastE(enemy) end
 				
 				elseif enemy.health <= (qDmg + eDmg + itemsDmg) and GetDistance(enemy) <= eRange
 					and EREADY and QREADY then
@@ -215,7 +220,7 @@ function SmartKS()
 						if HXGREADY then CastSpell(hxgSlot, enemy) end
 						if BWCREADY then CastSpell(bwcSlot, enemy) end
 						if BRKREADY then CastSpell(brkSlot, enemy) end
-						if EREADY then CastSpell(_E,enemy) end
+						if EREADY then CastE(enemy) end
 						if QREADY then CastSpell(_Q, Target) end
 						
 				
@@ -235,15 +240,15 @@ end
 end
 
 function CountEnemies(point, range)
-        local ChampCount = 0
-        for i = 1, heroManager.iCount, 1 do
-                local enemyhero = heroManager:getHero(i)
-                if myHero.team ~= enemyhero.team then
-                        if GetDistance(enemyhero, point) <= range then
-                                ChampCount = ChampCount + 1
-                        end
-                end
-        end            
+		local ChampCount = 0
+		for i = 1, heroManager.iCount, 1 do
+				local enemyhero = heroManager:getHero(i)
+				if myHero.team ~= enemyhero.team then
+						if GetDistance(enemyhero, point) <= range then
+								ChampCount = ChampCount + 1
+						end
+				end
+		end			
 end
 
 
@@ -257,30 +262,30 @@ function UltManagement(unit)
 end
 
 
---[[
+
 --[Casting our E into Enemies]--
-function CastE(Target)
- if IsSACReborn and VIP_USER then
-    if EREADY then
-     SkillE:Cast(Target) end
-    if EREADY then 
-		AutoCarry.CastSkillshot(SkillE, Target)
-    end
+function CastE(EnemyTarget)
+	if VIP_USER then
+		if EREADY then
+			local ePos = ProdictE:GetPrediction(EnemyTarget)
+			if ePos then CastSpell(_E, ePos.x, ePos.z) end
+		end
+	else
+		if EREADY then AutoCarry.CastSkillshot(SkillE, EnemyTarget.x, EnemyTarget.z) end
+	end
 end
-end
-]]--
 
 --[Full Combo with Items]--
 function FullCombo()
- if Target then
-  if AutoCarry.MainMenu.AutoCarry then
-   if QREADY and GetDistance(Target) <= qRange then 
-    CastSpell(_Q, Target)
-   elseif EREADY and GetDistance(Target) <= eRange then
-    CastSpell(_E, Target.x,Target.z)
+	if Target then
+		if AutoCarry.MainMenu.AutoCarry then
+			if QREADY and GetDistance(Target) <= qRange then 
+				CastSpell(_Q, Target)
+			elseif EREADY and GetDistance(Target) <= eRange then
+				CastE(Target)
+			end
+		end
 	end
-  end
- end
 end
 
 function JungleClear()
@@ -297,6 +302,7 @@ end
 
 --[Variables Load]--
 function mainLoad()
+
 	if AutoCarry.Skills then IsSACReborn = true else IsSACReborn = false end
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
@@ -315,23 +321,23 @@ function mainLoad()
 	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
 	enemyHeroes = GetEnemyHeroes()
 	GetEnemyHeroes()
-    GetAllyHeroes()
+	GetAllyHeroes()
 	ToInterrupt = {}
 	InterruptList = {
-    { charName = "Caitlyn", spellName = "CaitlynAceintheHole"},
-    { charName = "FiddleSticks", spellName = "Crowstorm"},
-    { charName = "FiddleSticks", spellName = "DrainChannel"},
-    { charName = "Galio", spellName = "GalioIdolOfDurand"},
-    { charName = "Karthus", spellName = "FallenOne"},
-    { charName = "Katarina", spellName = "KatarinaR"},
-    { charName = "Malzahar", spellName = "AlZaharNetherGrasp"},
-    { charName = "MissFortune", spellName = "MissFortuneBulletTime"},
-    { charName = "Nunu", spellName = "AbsoluteZero"},
-    { charName = "Pantheon", spellName = "Pantheon_GrandSkyfall_Jump"},
-    { charName = "Shen", spellName = "ShenStandUnited"},
-    { charName = "Urgot", spellName = "UrgotSwap2"},
-    { charName = "Varus", spellName = "VarusQ"},
-    { charName = "Warwick", spellName = "InfiniteDuress"}
+	{ charName = "Caitlyn", spellName = "CaitlynAceintheHole"},
+	{ charName = "FiddleSticks", spellName = "Crowstorm"},
+	{ charName = "FiddleSticks", spellName = "DrainChannel"},
+	{ charName = "Galio", spellName = "GalioIdolOfDurand"},
+	{ charName = "Karthus", spellName = "FallenOne"},
+	{ charName = "Katarina", spellName = "KatarinaR"},
+	{ charName = "Malzahar", spellName = "AlZaharNetherGrasp"},
+	{ charName = "MissFortune", spellName = "MissFortuneBulletTime"},
+	{ charName = "Nunu", spellName = "AbsoluteZero"},
+	{ charName = "Pantheon", spellName = "Pantheon_GrandSkyfall_Jump"},
+	{ charName = "Shen", spellName = "ShenStandUnited"},
+	{ charName = "Urgot", spellName = "UrgotSwap2"},
+	{ charName = "Varus", spellName = "VarusQ"},
+	{ charName = "Warwick", spellName = "InfiniteDuress"}
 }
 
 	for _, enemy in pairs(enemyHeroes) do
@@ -348,8 +354,8 @@ function OnProcessSpell(unit, spell)
 		for _, ability in pairs(ToInterrupt) do
 			if spell.name == ability and unit.team ~= myHero.team then
 				if eRange >= GetDistance(unit) then
-					CastSpell(_E, Target.x,Target.z)
-					if Extras.interrupt then print("Tried to interrupt " .. spell.name) end
+					CastE(unit)
+					if Extras.interrupt then print("Tried to interrupt: " .. spell.name) end
 				end
 			end
 		end
