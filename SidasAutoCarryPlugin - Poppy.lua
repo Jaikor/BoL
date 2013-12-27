@@ -1,5 +1,5 @@
 --[[
-	AutoCarry Plugin - Shaco The Iron Ambassador 1.0 by Jaikor 
+	AutoCarry Plugin - Poppy The Iron Ambassador 1.0 by Jaikor 
 	With Code from HeX ( This is his work I just updated it a bit with his permission and Updated it)
 	All credit goes Basicly to HeX.
 	Credit to Skeem for his codes too xD
