@@ -78,11 +78,13 @@ function OnLoad()
 	ts = TargetSelector(TARGET_LOW_HP_PRIORITY, 600, DAMAGE_PHYSICAL, true)
     ts.name = "Udyr"
     UdyrConfig:addTS(ts)
+	--[[
 		if UdyrConfig.autoTS then
 		if #GetEnemyHeroes() > 1 then
 			arrangePrioritys(#GetEnemyHeroes())
 		end
 	end	
+	]]--
 	if myHero:GetSpellData(SUMMONER_1).name:find("SummonerDot") then ignite = SUMMONER_1
 	elseif myHero:GetSpellData(SUMMONER_2).name:find("SummonerDot") then ignite = SUMMONER_2 end
 end
@@ -375,6 +377,45 @@ end
 ----------------------------------------------------------------------------------------------------------
 --[[ Orbwalking ]]----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------
+function OrbWalking(Target)
+	if TimeToAttack() and GetDistance(Target) <= myHero.range + GetDistance(myHero.minBBox) then
+		myHero:Attack(Target)
+    elseif heroCanMove() then
+        moveToCursor()
+    end
+end
+
+function TimeToAttack()
+    return (GetTickCount() + GetLatency()/2 > lastAttack + lastAttackCD)
+end
+
+function heroCanMove()
+	return (GetTickCount() + GetLatency()/2 > lastAttack + lastWindUpTime + 20)
+end
+
+function moveToCursor()
+	if GetDistance(mousePos) then
+		local moveToPos = myHero + (Vector(mousePos) - myHero):normalized()*300
+		myHero:MoveTo(moveToPos.x, moveToPos.z)
+    end        
+end
+
+function OnProcessSpell(object,spell)
+	if object == myHero then
+		if spell.name:lower():find("attack") then
+			lastAttack = GetTickCount() - GetLatency()/2
+			lastWindUpTime = spell.windUpTime*1000
+			lastAttackCD = spell.animationTime*1000
+        end
+    end
+end
+
+function OnAnimation(unit,animationName)
+    if unit.isMe and lastAnimation ~= animationName then lastAnimation = animationName end
+end
+
+
+--[[
 function OnProcessSpell(object, spell)
 	if myHero.dead then return end
 	if object.isMe then
@@ -410,6 +451,10 @@ function moveToCursor()
 	end
 end
 
+]]--
+
+
+--[[
 local priorityTable = {
 	AP = {
 		"Ahri", "Akali", "Anivia", "Annie", "Brand", "Cassiopeia", "Diana", "Evelynn", "FiddleSticks", "Fizz", "Gragas", "Heimerdinger", "Karthus",
@@ -456,3 +501,5 @@ function arrangePrioritys(enemies)
 		SetPriority(priorityTable.Tank,     enemy, priorityOrder[enemies][5])
 	end
 end
+
+]]--
