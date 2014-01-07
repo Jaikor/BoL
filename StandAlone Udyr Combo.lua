@@ -389,6 +389,10 @@ function TimeToAttack()
     return (GetTickCount() + GetLatency()/2 > lastAttack + lastAttackCD)
 end
 
+function timeToShoot()
+	return (GetTickCount() + GetLatency()/2 > lastAttack + lastAttackCD)
+end
+
 function heroCanMove()
 	return (GetTickCount() + GetLatency()/2 > lastAttack + lastWindUpTime + 20)
 end
@@ -412,6 +416,13 @@ end
 
 function OnAnimation(unit,animationName)
     if unit.isMe and lastAnimation ~= animationName then lastAnimation = animationName end
+end
+
+function moveToCursor()
+	if GetDistance(mousePos) > 1 or lastAnimation == "Idle1" then
+		local moveToPos = myHero + (Vector(mousePos) - myHero):normalized()*walkDistance
+		myHero:MoveTo(moveToPos.x, moveToPos.z)
+	end
 end
 
 
