@@ -168,19 +168,19 @@ function OnTick()
 		if GetInventoryItemIsCastable(3042) and GetDistance(ts.target) < 350 then CastSpell(GetInventorySlotItem(3042)) end
 		--We have E-Q-R-W
 		if myHero:GetSpellData(_Q).level >= 1 and myHero:GetSpellData(_W).level >= 1 and myHero:GetSpellData(_E).level >= 1 and myHero:GetSpellData(_R).level >= 1 then
-			if EREADY then
+			if EREADY and TargetHaveBuff("udyrbearstuncheck", ts.target) == false then
 				CastSpell(_E)
 				lastCast = "E"
 				AAcount = 0
-			elseif QREADY and (lastCast == "E" or lastCast == "none" or lastCast == "W") and AAcount >= 1 then
+			elseif (TargetHaveBuff("udyrbearstuncheck", ts.target) == true and QREADY) and (lastCast == "E" or lastCast == "none" or lastCast == "W") and AAcount >= 1 then
 				CastSpell(_Q)
 				lastCast = "Q"
 				AAcount = 0
-			elseif RREADY and lastCast == "Q" and AAcount >= 1 then
+			elseif (TargetHaveBuff("udyrbearstuncheck", ts.target) == true and RREADY) and lastCast == "Q" and AAcount >= 1 then
 				CastSpell(_R)
 				lastCast = "R"
 				AAcount = 0
-			elseif WREADY and lastCast == "R" and AAcount >= 4 then
+			elseif (TargetHaveBuff("udyrbearstuncheck", ts.target) == true and WREADY) and lastCast == "R" and AAcount >= 4 then
 				CastSpell(_W)
 				lastCast = "W"
 				AAcount = 0
@@ -188,15 +188,15 @@ function OnTick()
 			OrbWalk()
 		--We have E-R-W
 		elseif myHero:GetSpellData(_W).level >= 1 and myHero:GetSpellData(_E).level >= 1 and myHero:GetSpellData(_R).level >= 1 and myHero:GetSpellData(_Q).level == 0 then
-			if EREADY then
+			if EREADY and TargetHaveBuff("udyrbearstuncheck", ts.target) == false then
 				CastSpell(_E)
 				lastCast = "E"
 				AAcount = 0
-			elseif RREADY and (lastCast == "E" or lastCast == "none" or lastCast == "W") and AAcount >= 1 then
+			elseif (TargetHaveBuff("udyrbearstuncheck", ts.target) == true and RREADY) and (lastCast == "E" or lastCast == "none" or lastCast == "W") and AAcount >= 1 then
 				CastSpell(_R)
 				lastCast = "R"
 				AAcount = 0
-			elseif WREADY and lastCast == "R" and AAcount >= 4 then
+			elseif (TargetHaveBuff("udyrbearstuncheck", ts.target) == true and WREADY) and lastCast == "R" and AAcount >= 4 then
 				CastSpell(_W)
 				lastCast = "W"
 				AAcount = 0
@@ -204,15 +204,15 @@ function OnTick()
 			OrbWalk()
 		--We have E-Q-W
 		elseif myHero:GetSpellData(_W).level >= 1 and myHero:GetSpellData(_E).level >= 1 and myHero:GetSpellData(_Q).level >= 1 and myHero:GetSpellData(_R).level == 0 then
-			if EREADY then
+			if EREADY and TargetHaveBuff("udyrbearstuncheck", ts.target) == false then
 				CastSpell(_E)
 				lastCast = "E"
 				AAcount = 0
-			elseif QREADY and (lastCast == "E" or lastCast == "none" or lastCast == "W") and AAcount >= 1 then
+			elseif (TargetHaveBuff("udyrbearstuncheck", ts.target) == true and QREADY) and (lastCast == "E" or lastCast == "none" or lastCast == "W") and AAcount >= 1 then
 				CastSpell(_Q)
 				lastCast = "Q"
 				AAcount = 0
-			elseif WREADY and lastCast == "Q" and AAcount >= 1 then
+			elseif (TargetHaveBuff("udyrbearstuncheck", ts.target) == true and WREADY) and lastCast == "Q" and AAcount >= 1 then
 				CastSpell(_W)
 				lastCast = "W"
 				AAcount = 0
@@ -236,15 +236,15 @@ function OnTick()
 			OrbWalk()
 		--We have E-Q-R
 		elseif myHero:GetSpellData(_W).level == 0 and myHero:GetSpellData(_E).level >=1 and myHero:GetSpellData(_Q).level >= 1 and myHero:GetSpellData(_R).level >= 1 then
-			if EREADY then
+			if EREADY and TargetHaveBuff("udyrbearstuncheck", ts.target) == false then
 				CastSpell(_E)
 				lastCast = "E"
 				AAcount = 0
-			elseif QREADY and (((lastCast == "E" or lastCast == "none") and AAcount >= 1) or (lastCast == "R" and AAcount >= 4)) then
+			elseif TargetHaveBuff("udyrbearstuncheck", ts.target) == true and QREADY and (((lastCast == "E" or lastCast == "none") and AAcount >= 1) or (lastCast == "R" and AAcount >= 4)) then
 				CastSpell(_Q)
 				lastCast = "Q"
 				AAcount = 0
-			elseif RREADY and lastCast == "Q" and AAcount >= 1 then
+			elseif TargetHaveBuff("udyrbearstuncheck", ts.target) == true and RREADY and lastCast == "Q" and AAcount >= 1 then
 				CastSpell(_R)
 				lastCast = "R"
 				AAcount = 0
@@ -264,11 +264,11 @@ function OnTick()
 			OrbWalk()
 		--We have E-Q
 		elseif myHero:GetSpellData(_W).level == 0 and myHero:GetSpellData(_R).level == 0 and myHero:GetSpellData(_Q).level >= 1 and myHero:GetSpellData(_E).level >= 1 then
-			if EREADY then
+			if EREADY TargetHaveBuff("udyrbearstuncheck", ts.target) == false then
 				CastSpell(_E)
 				lastCast = "E"
 				AAcount = 0
-			elseif QREADY and (lastCast == "E" or lastCast == "none" or lastCast == "Q") and AAcount >= 1 then
+			elseif TargetHaveBuff("udyrbearstuncheck", ts.target) == true and QREADY and (lastCast == "E" or lastCast == "none" or lastCast == "Q") and AAcount >= 1 then
 				CastSpell(_Q)
 				lastCast = "Q"
 				AAcount = 0
@@ -320,7 +320,8 @@ end
 
 function OrbWalk()
 	if not TargetHaveBuff("udyrbearstuncheck", ts.target) then
-		myHero:Attack(ts.target)
+	if EREADY and not TargetHaveBuff("udyrbearstuncheck", ts.target) then
+			CastSpell(_E) or myHero:Attack(ts.target)
 	else
 		if GetDistance(ts.target) <= myHero.range + 65 then
 			if timeToShoot() then
@@ -332,6 +333,7 @@ function OrbWalk()
 			myHero:Attack(ts.target)
 		end
 	end
+end
 end
 
 
