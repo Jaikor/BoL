@@ -320,8 +320,7 @@ end
 
 function OrbWalk()
 	if not TargetHaveBuff("udyrbearstuncheck", ts.target) then
-	if EREADY and not TargetHaveBuff("udyrbearstuncheck", ts.target) then
-			CastSpell(_E) or myHero:Attack(ts.target)
+		myHero:Attack(ts.target)
 	else
 		if GetDistance(ts.target) <= myHero.range + 65 then
 			if timeToShoot() then
@@ -333,7 +332,6 @@ function OrbWalk()
 			myHero:Attack(ts.target)
 		end
 	end
-end
 end
 
 
