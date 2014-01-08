@@ -264,7 +264,7 @@ function OnTick()
 			OrbWalk()
 		--We have E-Q
 		elseif myHero:GetSpellData(_W).level == 0 and myHero:GetSpellData(_R).level == 0 and myHero:GetSpellData(_Q).level >= 1 and myHero:GetSpellData(_E).level >= 1 then
-			if EREADY TargetHaveBuff("udyrbearstuncheck", ts.target) == false then
+			if EREADY and TargetHaveBuff("udyrbearstuncheck", ts.target) == false then
 				CastSpell(_E)
 				lastCast = "E"
 				AAcount = 0
