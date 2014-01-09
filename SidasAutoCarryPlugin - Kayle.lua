@@ -76,7 +76,7 @@ end
 
 function OnGainBuff(unit, buff)
 	if unit.isMe and buff.name == eBuff then
-		AutoCarry.MyHero.IsMelee = false
+		AutoCarry.myHero.IsMelee = false
 		EM.range = 625.5
 		eFlag = true
 	end
@@ -84,7 +84,7 @@ end
 
 function OnLoseBuff(unit, buff)
 	if unit.isMe and buff.name == eBuff then
-		AutoCarry.MyHero.IsMelee = true
+		AutoCarry.myHero.IsMelee = true
 		EM.range = 255.5
 		eFlag = false
 	end 
