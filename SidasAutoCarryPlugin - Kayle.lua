@@ -4,11 +4,11 @@
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
 	Special thanks to Felina, Chrisokgo and gespierd and all the others who help testing the script for me. 
-	Credtis to RoachxD helping out allot fixing bugs 
+	Credtis to RoachxD helping out fixing bugs ;)
 	Copyright 2013
 	Changelog :
    1.0 - Initial Release
-   1.1 - Bug fixes, reborn & revamp compatible
+   1.1 - Bug fixes, ult fixed, reborn & revamp compatible
  ]] --
 
 if myHero.charName ~= "Kayle" then return end
@@ -76,7 +76,7 @@ function PluginOnDraw()
 	end
 end
 
-if VIP_USER then
+if VIP_USER and IsSACReborn then
 	function OnGainBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
 			AutoCarry.MyHero.IsMelee = false
@@ -329,10 +329,12 @@ function mainLoad()
 	waittxt = {} -- prevents UI lags, all credits to Dekaron
 	for i=1, heroManager.iCount do waittxt[i] = i*3 end -- All credits to Dekaron
 	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
-	EM = AutoCarry.EnemyMinions()
-	AdvancedCallback:bind('OnGainBuff', function(unit, buff) OnGainBuff(unit, buff) end)
-	AdvancedCallback:bind('OnLoseBuff', function(unit, buff) OnLoseBuff(unit, buff) end)
-	eBuff = "JudicatorRighteousFury"
+	if VIP_USER and IsSACReborn then
+		EM = AutoCarry.EnemyMinions()
+		AdvancedCallback:bind('OnGainBuff', function(unit, buff) OnGainBuff(unit, buff) end)
+		AdvancedCallback:bind('OnLoseBuff', function(unit, buff) OnLoseBuff(unit, buff) end)
+		eBuff = "JudicatorRighteousFury"
+	end
 	wBuffer = 400 --Wont use W unless they are this far away. 400 by default.
 	GetEnemyHeroes()
     GetAllyHeroes()
