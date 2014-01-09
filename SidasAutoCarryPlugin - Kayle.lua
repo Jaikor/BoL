@@ -4,9 +4,11 @@
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
 	Special thanks to Felina, Chrisokgo and gespierd and all the others who help testing the script for me. 
+	Credtis to RoachxD helping out allot fixing bugs 
 	Copyright 2013
 	Changelog :
    1.0 - Initial Release
+   1.1 - Bug fixes, reborn & revamp compatible
  ]] --
 
 if myHero.charName ~= "Kayle" then return end
@@ -74,20 +76,22 @@ function PluginOnDraw()
 	end
 end
 
-function OnGainBuff(unit, buff)
-	if unit.isMe and buff.name == eBuff then
-		AutoCarry.myHero.IsMelee = false
-		EM.range = 625.5
-		eFlag = true
+if VIP_USER then
+	function OnGainBuff(unit, buff)
+		if unit.isMe and buff.name == eBuff then
+			AutoCarry.MyHero.IsMelee = false
+			EM.range = 625.5
+			eFlag = true
+		end
 	end
-end
 
-function OnLoseBuff(unit, buff)
-	if unit.isMe and buff.name == eBuff then
-		AutoCarry.myHero.IsMelee = true
-		EM.range = 255.5
-		eFlag = false
-	end 
+	function OnLoseBuff(unit, buff)
+		if unit.isMe and buff.name == eBuff then
+			AutoCarry.MyHero.IsMelee = true
+			EM.range = 255.5
+			eFlag = false
+		end 
+	end
 end
 
 function BonusDamage()
