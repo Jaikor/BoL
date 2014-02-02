@@ -1,6 +1,6 @@
 --[[
-	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.1 by Jaikor 
-	With Code from Skeem
+	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.2 by Jaikor 
+	With Code from Skeem and thanks to him teaching me some stuff
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
 	Special thanks to Felina, Chrisokgo and gespierd and all the others who help testing the script for me. 
@@ -9,6 +9,7 @@
 	Changelog :
    1.0 - Initial Release
    1.1 - Bug fixes, ult fixed, reborn & revamp compatible
+   1.2 - Bug Fix, Free users should not get error, + added new function to ult should not cast if no enemy around
  ]] --
 
 if myHero.charName ~= "Kayle" then return end
@@ -109,9 +110,14 @@ function PluginOnCreateObj(obj)
 			Recall = true
 		end
 	end
-	if obj.name:find("Regenerationpotion_itm.troy") then
+		if obj.name:find("Regenerationpotion_itm.troy") then
 		if GetDistance(obj, myHero) <= 70 then
 			UsingHPot = true
+		end
+	end
+	if obj.name:find("RighteousFuryHalo_buff.troy") then
+		if GetDistance(obj, myHero) <= 70 then
+			eBuff = true
 		end
 	end
 	if obj.name:find("Global_Item_HealthPotion.troy") then
@@ -142,6 +148,11 @@ function PluginOnDeleteObj(obj)
 	if obj.name:find("Global_Item_ManaPotion.troy") then
 		UsingMPot = false
 		UsingFlask = false
+	end
+		if obj.name:find("RighteousFuryHalo_buff.troy") then
+		if GetDistance(obj, myHero) <= 70 then
+			eBuff = false
+		end
 	end
 end
 
@@ -280,7 +291,7 @@ end
 
 
 function UltManagement(unit)
-	if unit.health <= unit.maxHealth*(Menu.PercentofHealth/100) then CastSpell(_R, unit) end
+	if unit.health <= unit.maxHealth*(Menu.PercentofHealth/100) and CountEnemyHeroInRange(650, unit) > 0 then CastSpell(_R, unit) end
 end
 
 function OnProcessSpell(unit, spell)
