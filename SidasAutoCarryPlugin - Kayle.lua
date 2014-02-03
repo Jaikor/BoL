@@ -1,6 +1,6 @@
 --[[
 	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.2 by Jaikor 
-	With Code from Skeem and thanks to him teaching me some stuff
+	With Code from Skeem, thanks Skeem for teaching me the obj for free users
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
 	Special thanks to Felina, Chrisokgo and gespierd and all the others who help testing the script for me. 
@@ -9,7 +9,7 @@
 	Changelog :
    1.0 - Initial Release
    1.1 - Bug fixes, ult fixed, reborn & revamp compatible
-   1.2 - Bug Fix, Free users should not get error, + added new function to ult should not cast if no enemy around
+   1.2 - Bug Fixes, should work for free users, revamp and reborn, new ult logic it should only cast R on % hp if detects enemy in range
  ]] --
 
 if myHero.charName ~= "Kayle" then return end
@@ -77,6 +77,7 @@ function PluginOnDraw()
 	end
 end
 
+
 if VIP_USER and IsSACReborn then
 	function OnGainBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
@@ -118,6 +119,7 @@ function PluginOnCreateObj(obj)
 	if obj.name:find("RighteousFuryHalo_buff.troy") then
 		if GetDistance(obj, myHero) <= 70 then
 			eBuff = true
+			eFlag = true
 		end
 	end
 	if obj.name:find("Global_Item_HealthPotion.troy") then
@@ -152,6 +154,7 @@ function PluginOnDeleteObj(obj)
 		if obj.name:find("RighteousFuryHalo_buff.troy") then
 		if GetDistance(obj, myHero) <= 70 then
 			eBuff = false
+			eFlag = false
 		end
 	end
 end
@@ -293,6 +296,7 @@ end
 function UltManagement(unit)
 	if unit.health <= unit.maxHealth*(Menu.PercentofHealth/100) and CountEnemyHeroInRange(650, unit) > 0 then CastSpell(_R, unit) end
 end
+
 
 function OnProcessSpell(unit, spell)
 	if Menu.useR and unit.team ~= myHero.team and spell.name == "zedult" then UltManagement(spell.target) end
