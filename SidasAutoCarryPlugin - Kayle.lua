@@ -32,6 +32,11 @@ function PluginOnTick()
 	Checks()
 	SmartKS()
 	farmMinions:update()
+	if myHero.range > 350 then
+    eFlag = true
+else
+  eFlag = false
+end
 
 	if Carry.AutoCarry then FullCombo() end
 	if Carry.MixedMode and Target then 
@@ -44,8 +49,6 @@ function PluginOnTick()
 					end
 				end
 		end
-	
-	local RREADY = myHero:CanUseSpell(_R) == READY
 	if Menu.useR and RREADY then 
 		for i, ally in ipairs(GetAllyHeroes()) do 
 			if ally and not ally.dead and ally.visible and GetDistance(ally) <= rRange then 
@@ -78,10 +81,9 @@ function PluginOnDraw()
 end
 
 
-if VIP_USER and IsSACReborn then
 	function OnGainBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
-			AutoCarry.MyHero.IsMelee = false
+			--[[AutoCarry.MyHero.IsMelee = false]]--
 			EM.range = 625.5
 			eFlag = true
 		end
@@ -89,12 +91,12 @@ if VIP_USER and IsSACReborn then
 
 	function OnLoseBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
-			AutoCarry.MyHero.IsMelee = true
+			--[[AutoCarry.MyHero.IsMelee = true]]--
 			EM.range = 255.5
 			eFlag = false
 		end 
 	end
-end
+
 
 function BonusDamage()
 	if eFlag then
@@ -344,12 +346,12 @@ function mainLoad()
 	waittxt = {} -- prevents UI lags, all credits to Dekaron
 	for i=1, heroManager.iCount do waittxt[i] = i*3 end -- All credits to Dekaron
 	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
-	if VIP_USER and IsSACReborn then
+
 		EM = AutoCarry.EnemyMinions()
 		AdvancedCallback:bind('OnGainBuff', function(unit, buff) OnGainBuff(unit, buff) end)
 		AdvancedCallback:bind('OnLoseBuff', function(unit, buff) OnLoseBuff(unit, buff) end)
 		eBuff = "JudicatorRighteousFury"
-	end
+
 	wBuffer = 400 --Wont use W unless they are this far away. 400 by default.
 	GetEnemyHeroes()
     GetAllyHeroes()
