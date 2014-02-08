@@ -1,5 +1,5 @@
 --[[
-	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.2 by Jaikor 
+	AutoCarry Plugin - Kayle The Judicator, Judgement Day Has Come !!! 1.2a by Jaikor 
 	With Code from Skeem, thanks Skeem for teaching me the obj for free users
 	Credtis to HeX Original Plugin and Pain for his work ( this is a improved version by me )
 	Credtis to fbragequit for the AA idea. thanks 
@@ -10,6 +10,7 @@
    1.0 - Initial Release
    1.1 - Bug fixes, ult fixed, reborn & revamp compatible
    1.2 - Bug Fixes, should work for free users, revamp and reborn, new ult logic it should only cast R on % hp if detects enemy in range
+   1.2a - BETA FIX
  ]] --
 
 if myHero.charName ~= "Kayle" then return end
@@ -81,9 +82,10 @@ function PluginOnDraw()
 end
 
 
+if VIP_USER and IsSACReborn then
 	function OnGainBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
-			--[[AutoCarry.MyHero.IsMelee = false]]--
+			AutoCarry.MyHero.IsMelee = false
 			EM.range = 625.5
 			eFlag = true
 		end
@@ -91,12 +93,12 @@ end
 
 	function OnLoseBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
-			--[[AutoCarry.MyHero.IsMelee = true]]--
+			AutoCarry.MyHero.IsMelee = true
 			EM.range = 255.5
 			eFlag = false
 		end 
 	end
-
+end
 
 function BonusDamage()
 	if eFlag then
@@ -104,7 +106,6 @@ function BonusDamage()
 	end
 	return 0
 end
-
 
 --[Object Detection]--
 function PluginOnCreateObj(obj)
@@ -346,12 +347,12 @@ function mainLoad()
 	waittxt = {} -- prevents UI lags, all credits to Dekaron
 	for i=1, heroManager.iCount do waittxt[i] = i*3 end -- All credits to Dekaron
 	farmMinions = minionManager(MINION_ENEMY, qRange+200, player)
-
+	if VIP_USER and IsSACReborn then
 		EM = AutoCarry.EnemyMinions()
 		AdvancedCallback:bind('OnGainBuff', function(unit, buff) OnGainBuff(unit, buff) end)
 		AdvancedCallback:bind('OnLoseBuff', function(unit, buff) OnLoseBuff(unit, buff) end)
 		eBuff = "JudicatorRighteousFury"
-
+    end
 	wBuffer = 400 --Wont use W unless they are this far away. 400 by default.
 	GetEnemyHeroes()
     GetAllyHeroes()
