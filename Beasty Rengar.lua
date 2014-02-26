@@ -1,6 +1,9 @@
 --[[
 Beasty rengar 2.0 fix by Prototype23 and his friend I myself didn't do much
 Credits to them and ofcourze Zikkah for this Beasty script
+U have to have 2 or 3 Stacks and ULT,, then u HOLD A and it suppose to do 3q....
+dunno how this works now since last update I haven't played with this in like 1 month
+has empowered W now on low HP and 5 stacks
 ]]--
 
 if myHero.charName ~= "Rengar" then return end
