@@ -9,6 +9,7 @@
     1.2 - Bug Fixes, should work for free users, revamp and reborn, new ult logic it should only cast R on % hp if detects enemy in range
     1.2a - BETA FIX
 	1.3 - no more Auto Carry now StandAlone Script
+	1.3a - HEAL added to ally 
 ]]--
 
 if myHero.charName ~= "Kayle" then return end
@@ -17,10 +18,10 @@ local rRange = 900
 local qRange,wRange,eRange,rRange = 650, 900, 525, 900
 
 function OnLoad()
-enemyMinions = minionManager(MINION_ENEMY, 525, myHero)
-jungleMinions = minionManager(MINION_JUNGLE, 525, myHero)
+    minionMobs = {}
+	minionClusters = {}
 	Vars()
-	PrintChat("<font color='#CCCCCC'> >> Kayle The Judicator v1.3 loaded! <<</font>")
+	PrintChat("<font color='#CCCCCC'> >> Kayle The Judicator v1.3a loaded! <<</font>")
 	KayleConfig = scriptConfig("Kayle - The Judicator", "Kayle_The_Judicator")
 	KayleConfig:addSubMenu("Basic Settings", "Combo")
 	KayleConfig.Combo:addParam("Combo", "Combo", SCRIPT_PARAM_ONKEYDOWN, false, 32)
@@ -30,11 +31,20 @@ jungleMinions = minionManager(MINION_JUNGLE, 525, myHero)
 	KayleConfig.Combo:addParam("useW", "Use - Devine Blessing", SCRIPT_PARAM_ONOFF, true)
 	KayleConfig.Combo:addParam("useE", "Use - Righteous Fury", SCRIPT_PARAM_ONOFF, true)
 	KayleConfig.Combo:addParam("useR", "Use - Intervention", SCRIPT_PARAM_ONOFF, true)
-	KayleConfig.Combo:addParam("PercentofHealth", "PercentofHealth",SCRIPT_PARAM_SLICE, 25, 0, 100, 0)
+	KayleConfig.Combo:addParam("PercentofHealth", "PercentofHealth",SCRIPT_PARAM_SLICE, 25, 0, 100, 0)	
 	KayleConfig.Combo:addParam("movement", "Basic Orb Walking", SCRIPT_PARAM_ONOFF, true)
 	KayleConfig.Combo:permaShow("Combo")
 	KayleConfig.Combo:permaShow("Harass")
 
+	--> Heal Settings
+	KayleConfig:addSubMenu("Heal Settings", "Heal")
+	KayleConfig.Heal:addSubMenu("Heal Targeting Settings", "HealTargeting")
+	KayleConfig.Heal:addParam("PercentofHealth", "PercentofHealth",SCRIPT_PARAM_SLICE, 25, 0, 100, 0)	
+	KayleConfig.Heal.HealTargeting:addParam(myHero.charName.."healTarget", "Heal Target - ".. myHero.charName, SCRIPT_PARAM_ONOFF, true)
+	for i, ally in ipairs(GetAllyHeroes()) do
+		KayleConfig.Heal.HealTargeting:addParam(ally.charName.."healTarget", "Heal Target - "..ally.charName, SCRIPT_PARAM_ONOFF, true)
+	end
+	KayleConfig.Heal:addParam("healAllies", "Heal Allies", SCRIPT_PARAM_ONOFF, true)
 
 	KayleConfig:addSubMenu("Farm Settings", "Farm")
 	KayleConfig.Farm:addParam("Farm", "Farm - Toggle[G]", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("G"))
@@ -48,9 +58,7 @@ jungleMinions = minionManager(MINION_JUNGLE, 525, myHero)
 	KayleConfig.Draw:addParam("drawText", "Draw Enemy Text", SCRIPT_PARAM_ONOFF, true)
 	KayleConfig.Draw:addParam("qDraw", "Draw - Reckoning", SCRIPT_PARAM_ONOFF, true)
     KayleConfig.Draw:addParam("cDraw", "Draw - Enemy Text", SCRIPT_PARAM_ONOFF, true)
-
-
-
+	
 	KayleConfig:addTS(ts)
 	
 	lastBasicAttack = os.clock()
@@ -90,8 +98,8 @@ function OnTick()
 			if stdReady then CastSpell(stdSlot) end
 		end
 		--[[	Abilities	]]--
-		if QREADY and GetDistance(ts.target) < range then
-			CastSpell(_Q, ts.target)
+		if QREADY and GetDistance(ts.target) < range then 
+				CastSpell(_Q, ts.target)
 		end
 		if EREADY and GetDistance(ts.target) < aRange then
 			CastSpell(_E)
@@ -99,18 +107,17 @@ function OnTick()
 		if WREADY and GetDistance(ts.target) > wBuffer then
 			CastSpell(_W, myHero)
 		end
-		--[[	Attacks	]]--
-		if swing == 0 and KayleConfig.Combo.attacks then
-			if GetDistance(ts.target) < range and GetTickCount() > nextTick then
-				myHero:Attack(ts.target)
-				nextTick = GetTickCount()
-			end
-			elseif swing == 1 and KayleConfig.Combo.movement and KayleConfig.Combo.attacks and GetTickCount() > (nextTick + 250) then
-				myHero:MoveTo(mousePos.x, mousePos.z)
-		end
-	end
-	--> Farm
-	if not KayleConfig.Combo.Combo and not KayleConfig.Combo.Harass then
+		
+--[[		
+		--> Farm
+ if not KayleConfig.Combo.Combo and not KayleConfig.Combo.Harass then
+        if KayleConfig.Farm.Farm then
+                                if KayleConfig.Farm.eFarm and EREADY then FarmWithE() end
+	 end
+     end   
+]]--	
+		
+			if not KayleConfig.Combo.Combo and not KayleConfig.Combo.Harass then
 		if KayleConfig.Farm.Farm then
 			for i, minion in pairs(enemyMinions.objects) do
 				if minion and minion.valid and not minion.dead and GetDistance(minion) <= 525 then
@@ -132,7 +139,30 @@ function OnTick()
 			end
 		end
 	end
-	if KayleConfig.Combo.useR and RREADY then 
+		
+		--[[	Attacks	]]--
+		if swing == 0 and KayleConfig.Combo.attacks then
+			if GetDistance(ts.target) < range and GetTickCount() > nextTick then
+				myHero:Attack(ts.target)
+				nextTick = GetTickCount()
+			end
+			elseif swing == 1 and KayleConfig.Combo.movement and KayleConfig.Combo.attacks and GetTickCount() > (nextTick + 250) then
+				myHero:MoveTo(mousePos.x, mousePos.z)
+		end
+	end
+	
+	if KayleConfig.Heal.healAllies then
+		if KayleConfig.Heal.HealTargeting[myHero.charName.."healTarget"] then
+			if healthLow(myHero) and myHero.mana >= myHero.maxMana*0.5 then CastSpell(_W, myHero) end
+		end
+		for i, ally in ipairs(GetAllyHeroes()) do
+			if ally and Config.Heal.HealTargeting[ally.charName.."healTarget"] then
+				if healthLow(ally) and myHero.mana >= myHero.maxMana*0.5 and GetDistance(ally) <= wRange then CastSpell(_W, ally) end
+			end
+		end
+	end
+	
+		if KayleConfig.Combo.useR and RREADY then 
 		for i, ally in ipairs(GetAllyHeroes()) do 
 			if ally and not ally.dead and ally.visible and GetDistance(ally) <= rRange then 
 				UltManagement(ally) 
@@ -140,6 +170,7 @@ function OnTick()
 		end
 		UltManagement(myHero)
 	end
+
 end
 
 function UseItems(enemy)
@@ -276,7 +307,12 @@ DFGREADY, BRKREADY, HXGREADY, BWCREADY, STDREADY = false, false, false, false, f
 DFGSlot, BRKSlot, HXGSlot, BWCSlot, STDSlot = nil, nil, nil, nil, nil
 end
 
+function healthLow(ally)
+	return ally.health <= ally.maxHealth*(KayleConfig.Heal.PercentofHealth/100)
+end
+
 function GlobalInfo()
+
 	MouseScreen = WorldToScreen(D3DXVECTOR3(mousePos.x, mousePos.y, mousePos.z))
 	QREADY = myHero:CanUseSpell(_Q) == READY 
     WREADY = myHero:CanUseSpell(_W) == READY
@@ -321,4 +357,73 @@ function GlobalInfo()
 	wgtReady = (wgtSlot ~= nil and myHero:CanUseSpell(wgtSlot) == READY)
 	tmtReady = (tmtSlot ~= nil and myHero:CanUseSpell(tmtSlot) == READY)
 	hdrReady = (hdrSlot ~= nil and myHero:CanUseSpell(hdrSlot) == READY)
+
 end
+
+
+--[[
+-------------------------------------------------------------------------
+------------------------------ TEST -------------------------------------
+-------------------------------------------------------------------------
+
+function FarmWithE()
+	for _, minion in pairs(enemyMinions.objects) do
+		if minion and minion.valid and not minion.dead and EREADY and GetDistance(minion) <= aRange then
+			if minion.health < (getDmg("E", minion, myHero) - 15) then 
+				table.insert(minionMobs, minion)
+			end
+		else
+			table.remove(minionMobs, minion)
+		end
+	end
+
+	local closeMinion = EWidth * 1.5
+
+	for _, minion in pairs(minionMobs) do
+		local foundCluster = false
+		for i, mc in ipairs(minionClusters) do
+			if GetDistance(mc, minion) < closeMinion then
+				mc.x = ((mc.x * mc.count) + minion.x) / (mc.count + 1)
+				mc.z = ((mc.z * mc.count) + minion.z) / (mc.count + 1)
+				mc.count = mc.count + 1
+				foundCluster = true
+				break
+			end
+		end
+
+		if not foundCluster then
+			local mc = {x=0, z=0, count=0}
+			mc.x = minion.x
+			mc.z = minion.z
+			mc.count = 1
+			table.insert(minionClusters, mc)
+		end
+	end
+
+	if #minionClusters < 1 then return end
+
+	local largestCluster = 0
+	local largestClusterSize = 0
+	for i, mc in ipairs(minionClusters) do
+		if mc.count > largestClusterSize then
+			largestCluster = i
+			largestClusterSize = mc.count
+		end
+	end
+
+	if largestClusterSize >= 1 then
+		minionCluster = minionClusters[largestCluster]
+		
+		-- Needs to be in OnDraw to function.
+		-- local minionClusterPoint = {x=minionCluster.x, y=myHero.y, z=minionCluster.z}
+		-- DrawArrowsToPos(myHero, minionClusterPoint)
+
+		CastSpell(_E)
+		myHero:Attack(minion)
+	end
+
+	minionMobs = nil
+	minionClusters = nil
+end
+]]--
+
