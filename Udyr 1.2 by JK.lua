@@ -109,11 +109,6 @@ function OnTick()
 	RREADY = (myHero:CanUseSpell(_R) == READY)
 	IREADY = (ignite ~= nil and myHero:CanUseSpell(ignite) == READY)
 
---[[	
-	JungleKey =  UdyrConfig.JungleClear
-	if JungleKey then JungleClear() end
-]]--
-
 
 	--[[ Move to Mouse ]]--
 	if UdyrConfig.moveToMouse and ts.target == nil and UdyrConfig.Combo then
@@ -265,7 +260,7 @@ function OnTick()
 			myHero:Attack(stunTarget)
 		end
 	end
-	
+
 			--> Farm
 	if not UdyrConfig.Combo then
 		if UdyrConfig.Farm.Farm then
@@ -286,8 +281,8 @@ function OnTick()
 			end
 			for i, minion in pairs(jungleMinions.objects) do
 				if minion and minion.valid and not minion.dead and GetDistance(minion) <= 525 then
-					if KayleConfig.Farm.eFarm and EREADY then
-						CastSpell(_E) 
+					if UdyrConfig.Farm.qFarm and QREADY then
+						CastSpell(_Q) 
 						myHero:Attack(minion)
 					end
 				end
