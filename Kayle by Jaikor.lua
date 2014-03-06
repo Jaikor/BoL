@@ -14,8 +14,11 @@
 
 if myHero.charName ~= "Kayle" then return end
 
+local aRange = 525
+local EWidth = 75
 local rRange = 900
 local qRange,wRange,eRange,rRange = 650, 900, 525, 900
+local wRange = 900
 
 function OnLoad()
     minionMobs = {}
@@ -107,16 +110,28 @@ function OnTick()
 		if WREADY and GetDistance(ts.target) > wBuffer then
 			CastSpell(_W, myHero)
 		end
+			
+		--[[	Attacks	]]--
+		if swing == 0 and KayleConfig.Combo.attacks then
+			if GetDistance(ts.target) < range and GetTickCount() > nextTick then
+				myHero:Attack(ts.target)
+				nextTick = GetTickCount()
+			end
+			elseif swing == 1 and KayleConfig.Combo.movement and KayleConfig.Combo.attacks and GetTickCount() > (nextTick + 250) then
+				myHero:MoveTo(mousePos.x, mousePos.z)
+		end
+	end
+	
 		
---[[		
 		--> Farm
+--[[
  if not KayleConfig.Combo.Combo and not KayleConfig.Combo.Harass then
         if KayleConfig.Farm.Farm then
                                 if KayleConfig.Farm.eFarm and EREADY then FarmWithE() end
 	 end
      end   
-]]--	
-		
+]]--
+
 			if not KayleConfig.Combo.Combo and not KayleConfig.Combo.Harass then
 		if KayleConfig.Farm.Farm then
 			for i, minion in pairs(enemyMinions.objects) do
@@ -139,17 +154,7 @@ function OnTick()
 			end
 		end
 	end
-		
-		--[[	Attacks	]]--
-		if swing == 0 and KayleConfig.Combo.attacks then
-			if GetDistance(ts.target) < range and GetTickCount() > nextTick then
-				myHero:Attack(ts.target)
-				nextTick = GetTickCount()
-			end
-			elseif swing == 1 and KayleConfig.Combo.movement and KayleConfig.Combo.attacks and GetTickCount() > (nextTick + 250) then
-				myHero:MoveTo(mousePos.x, mousePos.z)
-		end
-	end
+	
 	
 	if KayleConfig.Heal.healAllies then
 		if KayleConfig.Heal.HealTargeting[myHero.charName.."healTarget"] then
@@ -296,7 +301,7 @@ waittxt = {} -- prevents UI lags, all credits to Dekaron
 for i=1, heroManager.iCount do waittxt[i] = i*3 end
 --Spells --
 range = 650
-wBuffer = 400 --Wont use W unless they are this far away. 400 by default.
+wBuffer = 600 --Wont use W unless they are this far away. 600 by default.
 aRange = 525
 ignite = nil
 lastBasicAttack = 0
@@ -308,8 +313,9 @@ DFGSlot, BRKSlot, HXGSlot, BWCSlot, STDSlot = nil, nil, nil, nil, nil
 end
 
 function healthLow(ally)
-	return ally.health <= ally.maxHealth*(KayleConfig.Heal.PercentofHealth/100)
+	if ally.health <= ally.maxHealth*(KayleConfig.Heal.PercentofHealth/100) end
 end
+
 
 function GlobalInfo()
 
@@ -361,69 +367,72 @@ function GlobalInfo()
 end
 
 
+
 --[[
 -------------------------------------------------------------------------
 ------------------------------ TEST -------------------------------------
 -------------------------------------------------------------------------
 
 function FarmWithE()
-	for _, minion in pairs(enemyMinions.objects) do
-		if minion and minion.valid and not minion.dead and EREADY and GetDistance(minion) <= aRange then
-			if minion.health < (getDmg("E", minion, myHero) - 15) then 
-				table.insert(minionMobs, minion)
-			end
-		else
-			table.remove(minionMobs, minion)
-		end
-	end
+ for _, minion in pairs(enemyMinions.objects) do
+  if minion and minion.valid and not minion.dead and EREADY and GetDistance(minion) <= aRange then
+   if minion.health < (getDmg("E", minion, myHero) - 15) then 
+    table.insert(minionMobs, minion)
+   end
+  else
+   table.remove(minionMobs, minion)
+  end
+ end
 
-	local closeMinion = EWidth * 1.5
+ local closeMinion = EWidth * 1.5
 
-	for _, minion in pairs(minionMobs) do
-		local foundCluster = false
-		for i, mc in ipairs(minionClusters) do
-			if GetDistance(mc, minion) < closeMinion then
-				mc.x = ((mc.x * mc.count) + minion.x) / (mc.count + 1)
-				mc.z = ((mc.z * mc.count) + minion.z) / (mc.count + 1)
-				mc.count = mc.count + 1
-				foundCluster = true
-				break
-			end
-		end
+ for _, minion in pairs(minionMobs) do
+  local foundCluster = false
+  for i, mc in ipairs(minionClusters) do
+   if GetDistance(mc, minion) < closeMinion then
+    mc.x = ((mc.x * mc.count) + minion.x) / (mc.count + 1)
+    mc.z = ((mc.z * mc.count) + minion.z) / (mc.count + 1)
+    mc.count = mc.count + 1
+    foundCluster = true
+    break
+   end
+  end
 
-		if not foundCluster then
-			local mc = {x=0, z=0, count=0}
-			mc.x = minion.x
-			mc.z = minion.z
-			mc.count = 1
-			table.insert(minionClusters, mc)
-		end
-	end
+  if not foundCluster then
+   local mc = {x=0, z=0, count=0, unit=nil}
+   mc.x = minion.x
+   mc.z = minion.z
+   mc.count = 1
+   mc.unit = minion
+   table.insert(minionClusters, mc)
+  end
+ end
 
-	if #minionClusters < 1 then return end
+ if #minionClusters < 1 then return end
 
-	local largestCluster = 0
-	local largestClusterSize = 0
-	for i, mc in ipairs(minionClusters) do
-		if mc.count > largestClusterSize then
-			largestCluster = i
-			largestClusterSize = mc.count
-		end
-	end
+ local largestCluster = 0
+ local largestClusterSize = 0
+ local attackMinion = nil
+ for i, mc in ipairs(minionClusters) do
+  if mc.count > largestClusterSize then
+   largestCluster = i
+   largestClusterSize = mc.count
+   attackMinion = mc.unit
+  end
+ end
 
-	if largestClusterSize >= 1 then
-		minionCluster = minionClusters[largestCluster]
-		
-		-- Needs to be in OnDraw to function.
-		-- local minionClusterPoint = {x=minionCluster.x, y=myHero.y, z=minionCluster.z}
-		-- DrawArrowsToPos(myHero, minionClusterPoint)
+ if attackMinion and largestClusterSize >= 1 then
+  minionCluster = minionClusters[largestCluster]
+  
+  -- Needs to be in OnDraw to function.
+  -- local minionClusterPoint = {x=minionCluster.x, y=myHero.y, z=minionCluster.z}
+  -- DrawArrowsToPos(myHero, minionClusterPoint)
 
-		CastSpell(_E)
-		myHero:Attack(minion)
-	end
+  CastSpell(_E)
+  myHero:Attack(attackMinion)
+ end
 
-	minionMobs = nil
-	minionClusters = nil
+ minionMobs = nil
+ minionClusters = nil
 end
 ]]--
-
