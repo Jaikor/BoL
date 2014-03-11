@@ -313,7 +313,7 @@ DFGSlot, BRKSlot, HXGSlot, BWCSlot, STDSlot = nil, nil, nil, nil, nil
 end
 
 function healthLow(ally)
-	if ally.health <= ally.maxHealth*(KayleConfig.Heal.PercentofHealth/100) end
+	return ally.health <= ally.maxHealth*(KayleConfig.Heal.PercentofHealth/100)
 end
 
 
