@@ -161,7 +161,7 @@ function OnTick()
 			if healthLow(myHero) and myHero.mana >= myHero.maxMana*0.5 then CastSpell(_W, myHero) end
 		end
 		for i, ally in ipairs(GetAllyHeroes()) do
-			if ally and Config.Heal.HealTargeting[ally.charName.."healTarget"] then
+			if ally and KayleConfig.Heal.HealTargeting[ally.charName.."healTarget"] then
 				if healthLow(ally) and myHero.mana >= myHero.maxMana*0.5 and GetDistance(ally) <= wRange then CastSpell(_W, ally) end
 			end
 		end
