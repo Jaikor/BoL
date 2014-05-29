@@ -3,7 +3,7 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 --{ Initiate Script (Checks for updates)
 	function Initiate()
 		local scriptName = "JKshen"
-		printMessage = function(message) print("<font color=\"#00A300\"><b>"..scriptName..":</b></font> <font color=\"#FFFFFF\">"..message.."</font>") end
+		printMessage = function(message) print("<font color=\"#690759\"><b>"..scriptName..":</b></font> <font color=\"#FFFFFF\">"..message.."</font>") end
 		if FileExist(LIB_PATH.."SourceLib.lua") then
 			require 'SourceLib'
 		else
@@ -12,6 +12,7 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 			return true
 		end
 		local libDownloader = Require(scriptName)
+		libDownloader:Add("Selector",	 "https://raw.github.com/LegendBot/Scripts/master/Common/Selector.lua")
 		libDownloader:Add("VPrediction", "https://raw.githubusercontent.com/Hellsing/BoL/master/common/VPrediction.lua")
 		libDownloader:Add("SOW",		 "https://raw.githubusercontent.com/Hellsing/BoL/master/common/SOW.lua")
 		libDownloader:Check()
@@ -21,18 +22,23 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 	end
 	if Initiate() then return end
 	printMessage("Loaded")
-	
+	--{ Initiate Data Load
+	local Shen = {
+		Q = {range = 475, speed = math.huge, delay = 0.7, width = 50, DamageType = _MAGIC, BaseDamage = 60, DamagePerLevel = 40, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.60, Extra = function() return (myHero:CanUseSpell(_Q) == READY) end},
+		E = {range = 600, DamageType = _MAGIC, BaseDamage = 50, DamagePerLevel = 35, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.5, Extra = function() return (myHero:CanUseSpell(_E) == READY) end},
+		R = {range = math.huge, speed = math.huge, delay = 0.5, Extra = function() return (myHero:CanUseSpell(_R) == READY) end}
+	}
 	--{ Script Load
 	function OnLoad()
 		--{ Variables
 			VP = VPrediction(true)
 			OW = SOW(VP)
 			TS = SimpleTS(STS_LESS_CAST_MAGIC)
-		    SpellQ = Spell(_Q, Shen.Q["range"])
-			SpellW = Spell(_W, Shen.W["range"])
-			SpellE = Spell(_E, Shen.E["range"]):SetSkillshot(VP, SKILLSHOT_LINEAR, Shen.E["width"], Shen.E["delay"], Shen.E["speed"], Shen.E["collision"])
+			SpellQ = Spell(_Q, Shen.Q["range"])
+			SpellE = Spell(_E, Shen.E["range"]):SetSkillshot(VP, SKILLSHOT_LINEAR, Shen.E["width"], Shen.E["delay"], Shen.E["speed"])
 			SpellR = Spell(_R, Shen.R["range"])
 			EnemyMinions = minionManager(MINION_ENEMY, Shen.Q["range"], myHero, MINION_SORT_MAXHEALTH_DEC)
+
 		--}
 		--{ DamageCalculator
 			DamageCalculator = DamageLib()
@@ -53,7 +59,7 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 			--}
 			--{ Target Selector			
 				Menu:addSubMenu("Shen: Target Selector","TS")
-				Menu.TS:addParam("TS","Target Selector",7,2,{ "AllClass", "SourceLib", "Selector", "SAC:Reborn", "MMA" })
+				Menu.TS:addParam("TS","Target Selector",7,2,{ "AllClass", "SourceLib", "Selector (Disabled)", "SAC:Reborn", "MMA" })
 				ts = TargetSelector(8,Shen.R["range"],1,false)
 				ts.name = "AllClass TS"
 				Menu.TS:addTS(ts)				
@@ -66,7 +72,6 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 			--{	Combo Settings
 				Menu:addSubMenu("Shen: Combo","Combo")
 				Menu.Combo:addParam("Q","Use Q in 'Combo'",1,true)
-				Menu.Combo:addParam("W","Use W in 'Combo'",1,true)
 				Menu.Combo:addParam("E","Use E in 'Combo'",1,true)
 			--}
 			--{ Harass Settings
@@ -77,7 +82,6 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 				Menu:addSubMenu("Shen: Farm","Farm")
 				Menu.Farm:addParam("Energy","Minimum Energy Percentage",4,70,0,100,0)
 				Menu.Farm:addParam("Q","Use Q in 'Farm'",1,true)
-				Menu.Farm:addParam("Qclear","Use Q in 'Lane Clear'",1,true)
 			--}
 			--{ Extra Settings
 				Menu:addSubMenu("Shen: Extra","Extra")
@@ -93,13 +97,12 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 			--{ Draw Settings
 				Menu:addSubMenu("Shen: Draw","Draw")
 				DrawHandler = DrawManager()
-				DrawHandler:CreateCircle(myHero,Karthus.Q["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "Q Range", true, true, true):LinkWithSpell(SpellQ, true)
-				DrawHandler:CreateCircle(myHero,Karthus.W["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "W Range", true, true, true):LinkWithSpell(SpellW, true)
-				DrawHandler:CreateCircle(myHero,Karthus.E["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "E Range", true, true, true):LinkWithSpell(SpellE, true)
+				DrawHandler:CreateCircle(myHero,Shen.Q["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "Q Range", true, true, true):LinkWithSpell(SpellQ, true)
+				DrawHandler:CreateCircle(myHero,Shen.E["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "E Range", true, true, true):LinkWithSpell(SpellE, true)
 				Menu.Draw:addSubMenu("Shen R","Ulti")
 				Menu.Draw.Ulti:addParam("X","X position for Text",4,50,0,WINDOW_W,0)
 				Menu.Draw.Ulti:addParam("Y","Y position for Text",4,50,0,WINDOW_H,0)
-				DamageCalculator:AddToMenu(Menu.Draw,{_Q,_W,_E,_R,_AA})
+				DamageCalculator:AddToMenu(Menu.Draw,{_Q,_E,_AA})
 			--}
 			--{ Perma Show Settings
 				Menu:addSubMenu("Shen: Perma Show","Perma")
@@ -139,43 +142,23 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 	function OnTick()
 		--{ Variables
 			QMANA = GetSpellData(_Q).mana
-			WMANA = GetSpellData(_W).mana
 			EMANA = GetSpellData(_E).mana
 			RMANA = GetSpellData(_R).mana
-			Farm = (Menu.General.LastHit or Menu.General.LaneClear) and Menu.Farm.Mana <= myHero.mana / myHero.maxMana * 100
+			Farm = Menu.General.LastHit and Menu.Farm.Energy <= myHero.mana / myHero.maxMana * 100
 			Combat = Menu.General.Combo or Menu.General.Harass
 			QREADY = (SpellQ:IsReady() and ((Menu.General.Combo and Menu.Combo.Q) or (Menu.General.Harass and Menu.Harass.Q) or (Farm and (Menu.Farm.Q or Menu.Farm.Qclear)) ))
-			WREADY = (SpellW:IsReady() and ((Menu.General.Combo and Menu.Combo.W) or (Menu.General.Harass and Menu.Harass.W) ))
-			EREADY = (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.E) or (Menu.General.Harass and Menu.Harass.E) or (Farm and Menu.Farm.E) ))
-			RREADY = (SpellR:IsReady() and ((Menu.General.Combo and Menu.Combo.R) ) and Menu.Extra.RCount <= RCountEnemyHeroInRange(Karthus.R["range"], myHero))
+			EREADY = (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.E) or (Menu.General.Harass and Menu.Harass.E) ))
 			Target = GrabTarget()
 		--}	
 		--{ Combo and Harass
-				if Target then
-					if DamageCalculator:IsKillable(Target,{_Q,_E,_W,,_AA}) then
-						if DamageCalculator:IsKillable(Target,{_Q}) and QREADY then
-							SpellQ:Cast(Target) 
-						elseif DamageCalculator:IsKillable(Target,{_E,_Q}) and EREADY and QREADY then
-							SpellE:Cast(Target) 
-							SpellQ:Cast(Target)
-							--
-						elseif DamageCalculator:IsKillable(Target,{_Q,_W,_E}) and QREADY and WREADY and EREADY then
-					    	SpellQ:Cast(Target) 
-						    SpellE:Cast(Target)
-							SpellW:Cast
-							--
-						elseif DamageCalculator:IsKillable(Target,{_E,_Q,_W,}) and EREADY and QREADY and WREADY then
-					    	SpellE:Cast(Target) 
-						    SpellQ:Cast(Target)
-							SpellW:Cast(Target)
-						else
-							if QREADY then
-								SpellQ:Cast(Target) 
-							end
-							if EREADY then
-								SpellE:Cast(Target)
-							end
-						end
+			if Combat and Target then				
+				if DamageCalculator:IsKillable(Target,{_Q,_E,_AA}) then
+					if DamageCalculator:IsKillable(Target,{_Q}) and QREADY then
+						SpellQ:Cast(Target) 
+					elseif DamageCalculator:IsKillable(Target,{_E,_Q}) and EREADY and QREADY then
+						SpellE:Cast(Target) 
+						SpellQ:Cast(Target)
+						--
 					else
 						if QREADY then
 							SpellQ:Cast(Target) 
@@ -184,25 +167,18 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 							SpellE:Cast(Target)
 						end
 					end
-					if Menu.Orbwalking.Enabled and (Menu.Orbwalking.Mode0 or Menu.Orbwalking.Mode1) then
-						OW:ForceTarget(Target)
+				else
+					if QREADY then
+						SpellQ:Cast(Target) 
+					end
+					if EREADY then
+						SpellE:Cast(Target)
 					end
 				end
+				if Menu.Orbwalking.Enabled and (Menu.Orbwalking.Mode0 or Menu.Orbwalking.Mode1) then
+					OW:ForceTarget(Target)
+				end
 			end
-		--}	
-		--{ Mixed Mode
-		    if Menu.General.Harass and not Target then
-				if Menu.Harass.Qfarm and SpellQ:IsReady() then
-	    			EnemyMinions:update()
-					for i, Minion in pairs(EnemyMinions.objects) do
-						if ValidTarget(Minion) and GetDistance(myHero,Minion) <= Shen.Q["range"] then
-							if DamageCalculator:IsKillable(Minion,{_Q}) then
-								SpellQ:Cast(Minion)
-							end
-						end
-					end
-    			end
-		    end
 		--}
 		--{ Farming
 			if Farm then
@@ -216,26 +192,10 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 				end
 			end
 		--}
-		if GetTickCount() > (PingTick or 0) then
-			PingTick = GetTickCount() + 500
-			if Menu.Extra.Notify then
-				for i = 1, heroManager.iCount, 1 do
-					local hero = heroManager:getHero(i)
-					if ValidTarget(hero) and DamageCalculator:IsKillable(hero,{_R}) then
-						if PingOnce ~= true then
-							PingSignal(PING_ALERT,hero.x,hero.y,hero.z,2) 
-							PingOnce = true
-							DelayAction(function() PingOnce = false end, 5)
-						end
-					end
-				end
-			end
-		end
 	end
+
 --}
-	function OnDraw()
-		DrawText(RCountEnemyHeroInRange(Karthus.R["range"],myHero).." players can by killed by Requiem.",15,Menu.Draw.Ulti.X,Menu.Draw.Ulti.Y,ARGB(255,1,255,74))
-	end
+
 --{ Target Selector
 	function GrabTarget()
 		if _G.MMA_Loaded and Menu.TS.TS == 5 then
@@ -255,9 +215,6 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 --}
 --{ Target Selector Range
 	function MaxRange()
-		if WREADY then
-			return Shen.W["range"]
-		end
 		if QREADY then
 			return Shen.Q["range"]
 		end
@@ -271,11 +228,11 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 	end
 --}
 
-function GetKillable()
+function UltManager()
 	for i = 1, allyCount do
 		local ally = allyTable[i].player
 		if ally.visible and ally ~= nil and not ally.dead then
-			if ally.health < ally.maxHealth*(Menu.PercentofHealth/100) and RREADY then
+			if ally.health < ally.maxHealth*(Menu.Extra.PercentofHealth/100) and RREADY then
 				if not allyTable[i].ultAlert then
 					PrintAlert(ally.charName.." Champeon in Danger use R ", Menu.Extra.ultAlert.alertTime, 128, 255, 0)
 
