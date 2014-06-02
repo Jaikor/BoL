@@ -32,6 +32,7 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 	--{ Script Load
 	function OnLoad()
 		--{ Variables
+	 	    wBuffer = 400
 		    eBuff = "JudicatorRighteousFury"
 			VP = VPrediction(true)
 			OW = SOW(VP)
@@ -50,11 +51,11 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 
 		--}
 				--{ Initiate Menu
-			Menu = scriptConfig("Shen","JKKayle")
+			Menu = scriptConfig("Kayle","JKKayle")
 			Menu:addParam("Author","Author: Jaikor",5,"")
 			Menu:addParam("Version","Version: "..version,5,"")
 			--{ General/Key Bindings
-				Menu:addSubMenu("Shen: General","General")
+				Menu:addSubMenu("Kayle: General","General")
 				Menu.General:addParam("Combo","Combo",2,false,32)
 				Menu.General:addParam("Harass","Harass (Mixed Mode)",2,false,string.byte("C"))
 				Menu.General:addParam("LastHit","Last Hit Creeps",2,false,string.byte("X"))
@@ -77,7 +78,6 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 				Menu.Combo:addParam("Q","Use Q in 'Combo'",1,true)
 				Menu.Combo:addParam("W","Use W in 'Combo'",1,true)
 				Menu.Combo:addParam("E","Use E in 'Combo'",1,true)
-				Menu.Combo:addParam("R","Use R in 'Combo'",1,true)
 			--}
 			--{ Harass Settings
 				Menu:addSubMenu("Kayle: Harass (Mixed Mode)","Harass")
@@ -88,6 +88,10 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 				Menu.Farm:addParam("Mana","Minimum Mana Percentage",4,70,0,100,0)
 				Menu.Farm:addParam("E","Use E in 'Farm'",1,true)
 			--}
+				Menu:addSubMenu("Kayle: Extra","Extra")
+			    Menu.Extra:addSubMenu("Ult - Ultimate Manager", "ult")
+				Menu.Extra:addParam("UseR", "Use Ult", SCRIPT_PARAM_ONOFF, true)
+				Menu.Extra:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
 			--{ Draw Settings
 				Menu:addSubMenu("Kayle: Draw","Draw")
 				DrawHandler = DrawManager()
@@ -95,7 +99,7 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 				DrawHandler:CreateCircle(myHero,Kayle.W["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "W Range", true, true, true):LinkWithSpell(SpellW, true)
 				DrawHandler:CreateCircle(myHero,Kayle.E["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "E Range", true, true, true):LinkWithSpell(SpellE, true)
 				DrawHandler:CreateCircle(myHero,Kayle.R["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "R Range", true, true, true):LinkWithSpell(SpellR, true)
-				DamageCalculator:AddToMenu(Menu.Draw,{_Q,_E,_W,_R,_AA})
+				DamageCalculator:AddToMenu(Menu.Draw,{_Q,_E,_AA})
 			--}
 			--{ Perma Show Settings
 				Menu:addSubMenu("Shen: Perma Show","Perma")
@@ -108,8 +112,7 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 				if Menu.Perma.GH then Menu.General:permaShow("Harass") end
 				Menu.Perma:addParam("CQ","Perma Show 'Combo > Q'",1,false)
 				Menu.Perma:addParam("CW","Perma Show 'Combo > W'",1,false)
-				Menu.Perma:addParam("CE","Perma Show 'Combo > E'",1,false)
-				Menu.Perma:addParam("CE","Perma Show 'Combo > R'",1,false)				
+				Menu.Perma:addParam("CE","Perma Show 'Combo > E'",1,false)			
 				if Menu.Perma.CQ then Menu.Combo:permaShow("Q") end
 				if Menu.Perma.CW then Menu.Combo:permaShow("W") end
 				if Menu.Perma.CE then Menu.Combo:permaShow("E") end
@@ -134,8 +137,9 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 			Farm = Menu.General.LastHit and Menu.Farm.Mana <= myHero.mana / myHero.maxMana * 100
 			Combat = Menu.General.Combo or Menu.General.Harass
 			QREADY = (SpellQ:IsReady() and ((Menu.General.Combo and Menu.Combo.Q) or (Menu.General.Harass and Menu.Harass.Q) or (Farm and (Menu.Farm.Q or Menu.Farm.Qclear)) ))
-			EREADY = (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.E) or (Menu.General.Harass and Menu.Harass.E) ))
-			WREADY = (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.W) ))
+			EREADY = not eBuff and (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.E) or (Menu.General.Harass and Menu.Harass.E) ))
+			WREADY = wBuferr and (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.W) ))
+			RREADY = (SpellR:IsReady() and ((Menu.General.Combo and Menu.Extra.UseR) ))
 			Target = GrabTarget()
 		--}	
 		--{ Combo and Harass
@@ -167,20 +171,31 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 					OW:ForceTarget(Target)
 				end
 			end
+			
+			if Menu.Extra.UseR and RREADY then 
+		for i, ally in ipairs(GetAllyHeroes()) do 
+			if ally and not ally.dead and ally.visible and GetDistance(ally) <= Kayle.R["range"] then 
+				UltManagement(ally) 
+			end
+		end
+		UltManagement(myHero)
+	end
+			
 		--}
 		--{ Farming
 			if Farm then
 				EnemyMinions:update()
 				for i, Minion in pairs(EnemyMinions.objects) do
 					if ValidTarget(Minion) then
-						if QREADY and (DamageCalculator:IsKillable(Minion,{_Q}) or Menu.General.LaneClear) then
-							SpellQ:Cast(Minion)
+						if EREADY and (DamageCalculator:IsKillable(Minion,{_E}) or Menu.General.LaneClear) then
+							SpellE:Cast(Minion)
 						end
 					end
 				end
 			end
-		--}
-	end
+		--}	
+end
+
 
 --}
 
@@ -221,16 +236,16 @@ if not VIP_USER or myHero.charName ~= "Kayle" then return end
 
 	function OnGainBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
-			MyHero.IsMelee = false
-			EM.range = 625.5
+			myHero.IsMelee = false
+			EnemyMinions.range = 625.5
 			eFlag = true
 		end
 	end
 
 	function OnLoseBuff(unit, buff)
 		if unit.isMe and buff.name == eBuff then
-			MyHero.IsMelee = true
-			EM.range = 255.5
+			myHero.IsMelee = true
+			EnemyMinions.range = 255.5
 			eFlag = false
 		end 
 	end
@@ -240,6 +255,10 @@ function BonusDamage()
 		return (myHero:GetSpellData(_E).level * 10 + 10) + myHero.ap * 0.4
 	end
 	return 0
+end
+
+function UltManagement(unit)
+	if unit.health <= unit.maxHealth*(Menu.Extra.PercentofHealth/100) and CountEnemyHeroInRange(650, unit) > 0 then SpellR:Cast(unit) end
 end
 
 UM = {
@@ -260,16 +279,16 @@ UM = {
                 { charName = "Warwick",         spellName = "InfiniteDuress" ,             important = 0}
 }
 
-function OnProcessSpell(unit, spell)
-	
-	if Menu.Combo.R then
+
+function OnProcessSpell(unit, spell)	
+	if Menu.Extra.UseR then
 		if unit.type == 'obj_AI_Hero' and unit.team == TEAM_ENEMY and GetDistance(unit) < Kayle.R["range"] then
 		   	local spellName = spell.name
 			for i = 1, #UM do
 				if unit.charName == UM[i].charName and spellName == UM[i].spellName then
 					if UM[i].important == 0 then
-						if Menu.Combo.R and RREADY and Kayle.R["range"] then
-							CastSpell(_R,unit.x,unit.z)
+						if Menu.Extra.UseR and RREADY and Kayle.R["range"] then
+							SpellR:Cast(unit)
 						end
 					end
 				end
