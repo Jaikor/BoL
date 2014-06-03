@@ -207,7 +207,7 @@ function OnProcessSpell(unit, spell)
 				if unit.charName == UM[i].charName and spellName == UM[i].spellName then
 					if UM[i].important == 0 then
 						if Menu.options.useUlt and R:IsReady() and rRng then
-							SpellR:Cast(unit)
+							CastSpell(_R, unit)
 						end
 					end
 				end
