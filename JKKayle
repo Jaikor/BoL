@@ -1,264 +1,183 @@
+require "SourceLib"
+if myHero.charName ~= "Kayle" then return end
 local version = 2.0
-if not VIP_USER or myHero.charName ~= "Kayle" then return end
---{ Initiate Script (Checks for updates)
-	function Initiate()
-		local scriptName = "JKKayle"
-		printMessage = function(message) print("<font color=\"#690759\"><b>"..scriptName..":</b></font> <font color=\"#FFFFFF\">"..message.."</font>") end
-		if FileExist(LIB_PATH.."SourceLib.lua") then
-			require 'SourceLib'
-		else
-			printMessage("Downloading SourceLib, please wait whilst the required library is being downloaded.")
-			DownloadFile("https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua",LIB_PATH.."SourceLib.lua", function() printMessage("SourceLib successfully downloaded, please reload (double [F9]).") end)
-			return true
+local autoUpdate   = true
+local scriptName = "JKKayle"
+local sourceLibFound = true
+if FileExist(LIB_PATH .. "SourceLib.lua") then
+    require "SourceLib"
+else
+    sourceLibFound = false
+    DownloadFile("https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua", LIB_PATH .. "SourceLib.lua", function() print("<font color=\"#6699ff\"><b>" .. scriptName .. ":</b></font> <font color=\"#FFFFFF\">SourceLib downloaded! Please reload!</font>") end)
+end
+if not sourceLibFound then return end
+
+-- Updater
+if autoUpdate then
+    SourceUpdater(scriptName, version, "raw.github.com", "/Jaikor/BoL/master/JKKayle.lua", SCRIPT_PATH .. GetCurrentEnv().FILE_NAME, "/Jaikor/BoL/master/Versions/JKkayle.version"):SetSilent(silentUpdate):CheckUpdate()
+end
+
+function OnLoad()
+	qRng, wRng, eRng, rRng = 650, 900, 525, 900
+	Q = Spell(_Q, qRng)
+	W = Spell(_W, wRng)
+	E = Spell(_E, eRng)
+	R = Spell(_R, rRng)
+	DFG = Item(3128,750)
+	Menu = scriptConfig("JKKayle","JKKayle")
+	-- Key Binds
+	Menu:addSubMenu("Key Bindings","bind")
+	Menu.bind:addParam("active", "Combo", SCRIPT_PARAM_ONKEYDOWN, false, 32)
+	Menu.bind:addParam("harass", "Harass", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("C"))
+	Menu.bind:addParam("auto", "Auto Spell", SCRIPT_PARAM_ONKEYTOGGLE, true, string.byte("N"))
+	-- Options
+	Menu:addSubMenu("Configurations","options")
+	Menu.options:addParam("useUlt", "Use Ult", SCRIPT_PARAM_ONOFF, true)
+	Menu.options:addParam("PercentofHealth", "PercentofHealth",SCRIPT_PARAM_SLICE, 25, 0, 100, 0)
+	-- Draw
+	Menu:addSubMenu("Draw","Draw")
+	Menu.Draw:addParam("drawq", "Draw Q", SCRIPT_PARAM_ONOFF, true)
+	Menu.Draw:addParam("draww", "Draw W", SCRIPT_PARAM_ONOFF, true)
+	Menu.Draw:addParam("drawe", "Draw E", SCRIPT_PARAM_ONOFF, true)
+	Menu.Draw:addParam("drawr", "Draw R", SCRIPT_PARAM_ONOFF, true)
+	Menu.Draw:addParam("drawtext", "Draw Text", SCRIPT_PARAM_ONOFF, true)
+	allyTable = {}
+	for i, enemy in ipairs(GetAllyHeroes()) do
+		Config.targets:addParam(""..ally.charName,"".. ally.charName,SCRIPT_PARAM_ONOFF, true)
+		table.insert(allyTable,ally.charName)
+	end
+	ts = TargetSelector(TARGET_LESS_CAST,qRng,DAMAGE_MAGIC,false)
+	ts.name = "Kayle"
+	Menu:addTS(ts)
+	PrintChat("<font color='#E97FA5'> >> JKKayle Loaded!</font>")
+end
+
+function OnTick()
+	ts:update()
+	if Menu.bind.active then 
+		fullCombo()
+	end
+	if Menu.bind.harass then
+		harass()
+	end
+	if Menu.bind.auto then
+		Auto()
+	end
+end
+
+function Auto()
+	if ts.target then
+		if Q:IsReady() and Q:IsInRange(ts.target,myHero) then
+			CastSpell(_Q,ts.target)
 		end
-		local libDownloader = Require(scriptName)
-		libDownloader:Add("Selector",	 "https://raw.github.com/LegendBot/Scripts/master/Common/Selector.lua")
-		libDownloader:Add("VPrediction", "https://raw.githubusercontent.com/Hellsing/BoL/master/common/VPrediction.lua")
-		libDownloader:Add("SOW",		 "https://raw.githubusercontent.com/Hellsing/BoL/master/common/SOW.lua")
-		libDownloader:Check()
-		if libDownloader.downloadNeeded then printMessage("Downloading required libraries, please wait whilst the required files are being downloaded.") return true end
-	    SourceUpdater(scriptName, version, "raw.github.com", "/Jaikor/BoL/master/JKKayle.lua", SCRIPT_PATH..GetCurrentEnv().FILE_NAME, "/Jaikor/BoL/master/Versions/JKkayle.version"):CheckUpdate()
-		return false
+		if E:IsReady() and E:IsInRange(ts.target, myHero) then
+            CastSpell(_E,ts.target)
 	end
-	if Initiate() then return end
-	printMessage("Loaded")
-	--{ Initiate Data Load
-	local Kayle = {
-		Q = {range = 650, speed = math.huge, delay = 0.7, DamageType = _MAGIC, BaseDamage = 60, DamagePerLevel = 50, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.60, Extra = function() return (myHero:CanUseSpell(_Q) == READY) end},
-		W = {range = 900, speed = math.huge, delay = 0.7, Extra = function() return (myHero:CanUseSpell(_W) == READY) end},
-		E = {range = 525, DamageType = _MAGIC, BaseDamage = 20, DamagePerLevel = 10, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.4, Extra = function() return (myHero:CanUseSpell(_E) == READY) end},
-		R = {range = 900, speed = math.huge, delay = 0.5, Extra = function() return (myHero:CanUseSpell(_R) == READY) end}
-	}
-	--{ Script Load
-	function OnLoad()
-		--{ Variables
-	 	    wBuffer = 400
-		    eBuff = "JudicatorRighteousFury"
-			VP = VPrediction(true)
-			OW = SOW(VP)
-			TS = SimpleTS(STS_LESS_CAST_MAGIC)
-			SpellQ = Spell(_Q, Kayle.Q["range"])
-			SpellW = Spell(_W, Kayle.W["range"])
-			SpellE = Spell(_E, Kayle.E["range"])
-			SpellR = Spell(_R, Kayle.R["range"])
-			EnemyMinions = minionManager(MINION_ENEMY, Kayle.E["range"], myHero, MINION_SORT_MAXHEALTH_DEC)
+end
+end
 
-		--}
-		--{ DamageCalculator
-			DamageCalculator = DamageLib()
-			DamageCalculator:RegisterDamageSource(_Q, Kayle.Q["DamageType"], Kayle.Q["BaseDamage"], Kayle.Q["DamagePerLevel"], Kayle.Q["ScalingStat"], Kayle.Q["PercentScaling"], Kayle.Q["Condition"], Kayle.Q["Extra"])
-			DamageCalculator:RegisterDamageSource(_E, Kayle.E["DamageType"], Kayle.E["BaseDamage"], Kayle.E["DamagePerLevel"], Kayle.E["ScalingStat"], Kayle.E["PercentScaling"], Kayle.E["Condition"], Kayle.E["Extra"])
+					
 
-		--}
-				--{ Initiate Menu
-			Menu = scriptConfig("Kayle","JKKayle")
-			Menu:addParam("Author","Author: Jaikor",5,"")
-			Menu:addParam("Version","Version: "..version,5,"")
-			--{ General/Key Bindings
-				Menu:addSubMenu("Kayle: General","General")
-				Menu.General:addParam("Combo","Combo",2,false,32)
-				Menu.General:addParam("Harass","Harass (Mixed Mode)",2,false,string.byte("C"))
-				Menu.General:addParam("LastHit","Last Hit Creeps",2,false,string.byte("X"))
-				Menu.General:addParam("LaneClear","Lane Clear",2,false,string.byte("V"))
-			--}
-			--{ Target Selector			
-				Menu:addSubMenu("Kayle: Target Selector","TS")
-				Menu.TS:addParam("TS","Target Selector",7,2,{ "AllClass", "SourceLib", "Selector (Disabled)", "SAC:Reborn", "MMA" })
-				ts = TargetSelector(8,Kayle.R["range"],1,false)
-				ts.name = "AllClass TS"
-				Menu.TS:addTS(ts)				
-			--}
-			--{ Orbwalking
-				Menu:addSubMenu("Kayle: Orbwalking","Orbwalking")
-				OW:LoadToMenu(Menu.Orbwalking)
-				Menu.Orbwalking.Mode0 = false
-			--}
-			--{	Combo Settings
-				Menu:addSubMenu("Kayle: Combo","Combo")
-				Menu.Combo:addParam("Q","Use Q in 'Combo'",1,true)
-				Menu.Combo:addParam("W","Use W in 'Combo'",1,true)
-				Menu.Combo:addParam("E","Use E in 'Combo'",1,true)
-			--}
-			--{ Harass Settings
-				Menu:addSubMenu("Kayle: Harass (Mixed Mode)","Harass")
-				Menu.Harass:addParam("Q","Use Q in 'Harass'",1,true)
-			--}
-			--{ Farm Settings
-				Menu:addSubMenu("Kayle: Farm","Farm")
-				Menu.Farm:addParam("Mana","Minimum Mana Percentage",4,70,0,100,0)
-				Menu.Farm:addParam("E","Use E in 'Farm'",1,true)
-			--}
-				Menu:addSubMenu("Kayle: Extra","Extra")
-			    Menu.Extra:addSubMenu("Ult - Ultimate Manager", "ult")
-				Menu.Extra:addParam("UseR", "Use Ult", SCRIPT_PARAM_ONOFF, true)
-				Menu.Extra:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
-			--{ Draw Settings
-				Menu:addSubMenu("Kayle: Draw","Draw")
-				DrawHandler = DrawManager()
-				DrawHandler:CreateCircle(myHero,Kayle.Q["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "Q Range", true, true, true):LinkWithSpell(SpellQ, true)
-				DrawHandler:CreateCircle(myHero,Kayle.W["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "W Range", true, true, true):LinkWithSpell(SpellW, true)
-				DrawHandler:CreateCircle(myHero,Kayle.E["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "E Range", true, true, true):LinkWithSpell(SpellE, true)
-				DrawHandler:CreateCircle(myHero,Kayle.R["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "R Range", true, true, true):LinkWithSpell(SpellR, true)
-				DamageCalculator:AddToMenu(Menu.Draw,{_Q,_E,_AA})
-			--}
-			--{ Perma Show Settings
-				Menu:addSubMenu("Shen: Perma Show","Perma")
-				Menu.Perma:addParam("INFO","The following options require a restart [F9 x2] to take effect",5,"")
-				Menu.Perma:addParam("GC","Perma Show 'General > Combo'",1,true)				
-				Menu.Perma:addParam("GF","Perma Show 'General > Farm'",1,true)
-				Menu.Perma:addParam("GH","Perma Show 'General > Harass'",1,true)
-				if Menu.Perma.GC then Menu.General:permaShow("Combo") end
-				if Menu.Perma.GF then Menu.General:permaShow("LastHit") end
-				if Menu.Perma.GH then Menu.General:permaShow("Harass") end
-				Menu.Perma:addParam("CQ","Perma Show 'Combo > Q'",1,false)
-				Menu.Perma:addParam("CW","Perma Show 'Combo > W'",1,false)
-				Menu.Perma:addParam("CE","Perma Show 'Combo > E'",1,false)			
-				if Menu.Perma.CQ then Menu.Combo:permaShow("Q") end
-				if Menu.Perma.CW then Menu.Combo:permaShow("W") end
-				if Menu.Perma.CE then Menu.Combo:permaShow("E") end
-				if Menu.Perma.CR then Menu.Combo:permaShow("R") end
-				Menu.Perma:addParam("HQ","Perma Show 'Harass > Q'",1,false)
-				if Menu.Perma.HQ then Menu.Harass:permaShow("Q") end
-				Menu.Perma:addParam("FE","Perma Show 'Farm > E'",1,false)
-				Menu.Perma:addParam("FC","Perma Show 'Farm > Eclear'",1,false)
-				if Menu.Perma.FQ then Menu.Farm:permaShow("E") end
-				if Menu.Perma.FC then Menu.Farm:permaShow("Eclear") end
-			--}
-		--}
+function harass()
+	if ts.target then
+		if E:IsReady() and E:IsInRange(ts.target, myHero) then
+            CastSpell(_E,ts.target)
 	end
---}
---{ Script Loop
-	function OnTick()
-		--{ Variables
-			QMANA = GetSpellData(_Q).mana
-			WMANA = GetSpellData(_W).mana
-			EMANA = GetSpellData(_E).mana
-			RMANA = GetSpellData(_R).mana
-			Farm = Menu.General.LastHit and Menu.Farm.Mana <= myHero.mana / myHero.maxMana * 100
-			Combat = Menu.General.Combo or Menu.General.Harass
-			QREADY = (SpellQ:IsReady() and ((Menu.General.Combo and Menu.Combo.Q) or (Menu.General.Harass and Menu.Harass.Q) or (Farm and (Menu.Farm.Q or Menu.Farm.Qclear)) ))
-			EREADY = not eBuff and (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.E) or (Menu.General.Harass and Menu.Harass.E) ))
-			WREADY = wBuferr and (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.W) ))
-			RREADY = (SpellR:IsReady() and ((Menu.General.Combo and Menu.Extra.UseR) ))
-			Target = GrabTarget()
-		--}	
-		--{ Combo and Harass
-			if Combat and Target then				
-				if DamageCalculator:IsKillable(Target,{_Q,_E,_AA}) then
-					if DamageCalculator:IsKillable(Target,{_Q}) and QREADY then
-						SpellQ:Cast(Target) 
-					elseif DamageCalculator:IsKillable(Target,{_E,_Q}) and EREADY and QREADY then
-						SpellE:Cast(Target) 
-						SpellQ:Cast(Target)
-						--
-					else
-						if QREADY then
-							SpellQ:Cast(Target) 
-						end
-						if EREADY then
-							SpellE:Cast(Target)
-						end
-					end
-				else
-					if QREADY then
-						SpellQ:Cast(Target) 
-					end
-					if EREADY then
-						SpellE:Cast(Target)
-					end
-				end
-				if Menu.Orbwalking.Enabled and (Menu.Orbwalking.Mode0 or Menu.Orbwalking.Mode1) then
-					OW:ForceTarget(Target)
-				end
-			end
-			
-			if Menu.Extra.UseR and RREADY then 
+		end
+		if Q:IsReady() and Q:IsInRange(ts.target,myHero) then
+			CastSpell(_Q,ts.target)
+		end
+	end
+
+function fullCombo()
+	if ts.target then
+		-- Casting DFG
+		if DFG:IsReady() and DFG:InRange(ts.target) then
+			DFG:Cast(ts.target)
+		end	
+		-- Casting Q
+		if Q:IsReady() and Q:IsInRange(ts.target,myHero) then
+			CastSpell(_Q,ts.target)
+		end
+		-- Casting W
+		if W:IsReady() and W:IsInRange(ts.target,myHero) and Menu.options.useW then
+				if W:IsInRange(ts.target,myHero) > wBuffer and W:IsReady() then
+				 CastSpell(_W, myHero) end
+		end
+		-- Casting E
+		if E:IsReady() and E:IsInRange(ts.target, myHero) then
+				if GetDistance(ts.target) < 525 then
+             CastSpell(_E,ts.target)
+		end
+		end
+		-- Casting R
+			if R:IsReady() and R:IsInRange(ts.target,myHero) and Menu.options.useUlt  then 
 		for i, ally in ipairs(GetAllyHeroes()) do 
-			if ally and not ally.dead and ally.visible and GetDistance(ally) <= Kayle.R["range"] then 
+			if ally and not ally.dead and ally.visible and GetDistance(ally) <= rRng then 
 				UltManagement(ally) 
 			end
 		end
 		UltManagement(myHero)
 	end
-			
-		--}
-		--{ Farming
-			if Farm then
-				EnemyMinions:update()
-				for i, Minion in pairs(EnemyMinions.objects) do
-					if ValidTarget(Minion) then
-						if EREADY and (DamageCalculator:IsKillable(Minion,{_E}) or Menu.General.LaneClear) then
-							SpellE:Cast(Minion)
-						end
-					end
-				end
-			end
-		--}	
-end
-
-
---}
-
---{ Target Selector
-	function GrabTarget()
-		if _G.MMA_Loaded and Menu.TS.TS == 5 then
-			return _G.MMA_ConsideredTarget(MaxRange()) 
-		elseif _G.AutoCarry and Menu.TS.TS == 4 then
-			return _G.AutoCarry.Crosshair:GetTarget()
-		elseif _G.Selector_Enabled and Menu.TS.TS == 3 then
-			return Selector.GetTarget(SelectorMenu.Get().mode, 'AP', {distance = MaxRange()})
-		elseif Menu.TS.TS == 2 then
-			return TS:GetTarget(MaxRange())
-		elseif Menu.TS.TS == 1 then
-			ts.range = MaxRange()
-			ts:update()
-			return ts.target
-		end
 	end
---}
---{ Target Selector Range
-	function MaxRange()
-		if QREADY then
-			return Kayle.Q["range"]
-		end
-		if RREADY then
-			return Kayle.R["range"]
-		end	
-		if WREADY then
-			return Kayle.W["range"]
-		end
-		if EREADY then
-			return Kayle.E["range"]
-		end
-		return myHero.range + 50
-	end
---}
-
-	function OnGainBuff(unit, buff)
-		if unit.isMe and buff.name == eBuff then
-			myHero.IsMelee = false
-			EnemyMinions.range = 625.5
-			eFlag = true
-		end
-	end
-
-	function OnLoseBuff(unit, buff)
-		if unit.isMe and buff.name == eBuff then
-			myHero.IsMelee = true
-			EnemyMinions.range = 255.5
-			eFlag = false
-		end 
-	end
-
-function BonusDamage()
-	if eFlag then
-		return (myHero:GetSpellData(_E).level * 10 + 10) + myHero.ap * 0.4
-	end
-	return 0
 end
 
 function UltManagement(unit)
-	if unit.health <= unit.maxHealth*(Menu.Extra.PercentofHealth/100) and CountEnemyHeroInRange(650, unit) > 0 then SpellR:Cast(unit) end
+	if unit.health <= unit.maxHealth*(Menu.options.PercentofHealth/100) and CountEnemyHeroInRange(650, unit) > 0 then CastSpell(_R, unit) end
+end
+
+
+function Damage(target)
+  if target then
+    local qDmg = getDmg("Q", target, myHero)
+    local wDmg = getDmg("W", target, myHero)
+    local rDmg = getDmg("R", target, myHero)
+    local dfgDmg = (GetInventorySlotItem(3128) ~= nil and getDmg("DFG", target, myHero)) or 0
+    local damageAmp = (GetInventorySlotItem(3128) ~= nil and 1.2) or 1
+		local currentDamage = 0
+    
+    if Q:IsReady() then
+     currentDamage = currentDamage + qDmg
+    end
+   
+    if W:IsReady() then
+     currentDamage = currentDamage + wDmg
+    end
+  
+	if R:IsReady() then
+		currentDamage = currentDamage + rDmg
+	end
+	 
+    if DFG:IsReady() then
+     currentDamage = (currentDamage * damageAmp) + dfgDmg
+    end
+		return currentDamage
+  end
+	
+end
+
+function OnDraw()
+	if Menu.Draw.drawq then
+		DrawCircle(myHero.x,myHero.y,myHero.z,qRng,0xFFFF0000)
+	end 
+	if Menu.Draw.draww then
+		DrawCircle(myHero.x,myHero.y,myHero.z,wRng,0xFFFF0000)
+	end
+	if Menu.Draw.drawe then
+		DrawCircle(myHero.x,myHero.y,myHero.z,eRng,0xFFFF0000)
+	end
+	if Menu.Draw.drawr then
+		DrawCircle(myHero.x,myHero.y,myHero.z,rRng,0xFFFF0000)
+	end
+	if Menu.drawtext then
+		for i, target in ipairs(GetEnemyHeroes()) do
+			if ValidTarget(target) and target.team ~= myHero.team and target.dead ~= true then
+				if Damage(target) > target.health then
+					PrintFloatText(target,0,"Killable")
+				end
+			end
+		end
+	end
 end
 
 UM = {
@@ -281,13 +200,13 @@ UM = {
 
 
 function OnProcessSpell(unit, spell)	
-	if Menu.Extra.UseR then
-		if unit.type == 'obj_AI_Hero' and unit.team == TEAM_ENEMY and GetDistance(unit) < Kayle.R["range"] then
+	if Menu.options.useUlt then
+		if unit.type == 'obj_AI_Hero' and unit.team == TEAM_ENEMY and GetDistance(unit) < rRng then
 		   	local spellName = spell.name
 			for i = 1, #UM do
 				if unit.charName == UM[i].charName and spellName == UM[i].spellName then
 					if UM[i].important == 0 then
-						if Menu.Extra.UseR and RREADY and Kayle.R["range"] then
+						if Menu.options.useUlt and R:IsReady() and rRng then
 							SpellR:Cast(unit)
 						end
 					end
