@@ -1,3 +1,4 @@
+require "VPrediction"
 require "SourceLib"
 if myHero.charName ~= "Kayle" then return end
 local version = 2.0
@@ -18,6 +19,7 @@ if autoUpdate then
 end
 
 function OnLoad()
+	VP = VPrediction()
 	qRng, wRng, eRng, rRng = 650, 900, 525, 900
 	Q = Spell(_Q, qRng)
 	W = Spell(_W, wRng)
