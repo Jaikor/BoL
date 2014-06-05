@@ -1,10 +1,12 @@
 require "VPrediction"
 require "SourceLib"
+require "SOW"
 if myHero.charName ~= "Kayle" then return end
 local version = 2.0
 local autoUpdate   = true
 local scriptName = "JKKayle"
 local sourceLibFound = true
+local VP = VPrediction()	
 if FileExist(LIB_PATH .. "SourceLib.lua") then
     require "SourceLib"
 else
@@ -25,6 +27,10 @@ function OnLoad()
 	W = Spell(_W, wRng)
 	E = Spell(_E, eRng)
 	R = Spell(_R, rRng)
+    DLib = DamageLib()
+	--DamageLib:RegisterDamageSource(spellId, damagetype, basedamage, perlevel, scalingtype, scalingstat, percentscaling, condition, extra)
+	DLib:RegisterDamageSource(_Q, _MAGIC, 60, 50, _MAGIC, _AP, 0.60, function() return (player:CanUseSpell(_Q) == READY)end)
+	DLib:RegisterDamageSource(_E, _MAGIC, 20, 10, _MAGIC, _AP, 0.40, function() return (player:CanUseSpell(_E) == READY)end)
 	DFG = Item(3128,750)
 	Menu = scriptConfig("JKKayle","JKKayle")
 	-- Key Binds
@@ -43,15 +49,15 @@ function OnLoad()
 	Menu.Draw:addParam("drawe", "Draw E", SCRIPT_PARAM_ONOFF, true)
 	Menu.Draw:addParam("drawr", "Draw R", SCRIPT_PARAM_ONOFF, true)
 	Menu.Draw:addParam("drawtext", "Draw Text", SCRIPT_PARAM_ONOFF, true)
-	allyTable = {}
-	for i, enemy in ipairs(GetAllyHeroes()) do
-		Config.targets:addParam(""..ally.charName,"".. ally.charName,SCRIPT_PARAM_ONOFF, true)
-		table.insert(allyTable,ally.charName)
-	end
-	ts = TargetSelector(TARGET_LESS_CAST,qRng,DAMAGE_MAGIC,false)
+	Orbwalker = SOW(VP)
+	Menu:addSubMenu("Orbwalker", "SOWorb")
+	Orbwalker:LoadToMenu(Menu.SOWorb)
+	Combo = {_Q, _E,}
+	DLib:AddToMenu(Menu.Draw,Combo)
+	ts = TargetSelector(TARGET_LESS_CAST,eRng,DAMAGE_MAGIC,false)
 	ts.name = "Kayle"
 	Menu:addTS(ts)
-	PrintChat("<font color='#E97FA5'> >> JKKayle Loaded!</font>")
+	PrintChat("<font color='#690759'> >> JKKayle Loaded!</font>")
 end
 
 function OnTick()
