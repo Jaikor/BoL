@@ -1,8 +1,7 @@
 require "VPrediction"
-require "SourceLib"
 require "SOW"
 if myHero.charName ~= "Kayle" then return end
-local version = 2.0
+local version = 2.1
 local autoUpdate   = true
 local scriptName = "JKKayle"
 local sourceLibFound = true
@@ -23,6 +22,8 @@ end
 function OnLoad()
 	VP = VPrediction()
 	qRng, wRng, eRng, rRng = 650, 900, 525, 900
+	EnemyMinions = minionManager(MINION_ENEMY, eRng, myHero, MINION_SORT_MAXHEALTH_DEC)
+	JungleMinions = minionManager(MINION_JUNGLE, eRng, myHero, MINION_SORT_MAXHEALTH_DEC)
 	Q = Spell(_Q, qRng)
 	W = Spell(_W, wRng)
 	E = Spell(_E, eRng)
@@ -38,6 +39,11 @@ function OnLoad()
 	Menu.bind:addParam("active", "Combo", SCRIPT_PARAM_ONKEYDOWN, false, 32)
 	Menu.bind:addParam("harass", "Harass", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("C"))
 	Menu.bind:addParam("auto", "Auto Spell", SCRIPT_PARAM_ONKEYTOGGLE, true, string.byte("N"))
+	-- Farming Options
+	Menu:addSubMenu("Farming","farm")
+	Menu.farm:addParam("JungleFarm", "JungleFarm", SCRIPT_PARAM_ONKEYDOWN, false,string.byte("G"))
+	Menu.farm:addParam("LaneClear", "LaneClear", SCRIPT_PARAM_ONKEYDOWN, false,string.byte("V"))
+	
 	-- Options
 	Menu:addSubMenu("Configurations","options")
 	Menu.options:addParam("useUlt", "Use Ult", SCRIPT_PARAM_ONOFF, true)
@@ -71,6 +77,12 @@ function OnTick()
 	if Menu.bind.auto then
 		Auto()
 	end
+	if Menu.farm.JungleFarm then
+	    JungleFarm()
+	end
+	if Menu.farm.LaneClear then
+	    LaneClear()
+	end
 end
 
 function Auto()
@@ -84,6 +96,29 @@ function Auto()
 end
 end
 
+function JungleFarm()
+				JungleMinions:update()
+					JungleCreep = JungleMinions.objects[1]
+					if ValidTarget(JungleCreep) then
+						if E:IsReady() and E:IsInRange(JungleCreep, myHero) then 
+							CastSpell(_E,JungleCreep)
+						elseif Q:IsReady() and Q:IsInRange(JungleCreep, myHero) then
+							CastSpell(_Q,JungleCreep)
+						end
+					end
+				end
+				
+function LaneClear()
+				EnemyMinions:update()
+				for i, Minion in pairs(EnemyMinions.objects) do
+					if ValidTarget(Minion) then
+						if E:IsReady() and Menu.farm.LaneClear then
+							CastSpell(_E,Minion)
+						end
+					end
+				end
+				end
+				
 					
 
 function harass()
