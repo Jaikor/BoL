@@ -1,7 +1,7 @@
 require "VPrediction"
 require "SOW"
 if myHero.charName ~= "Kayle" then return end
-local version = 2.1
+local version = 2.2
 local autoUpdate   = true
 local scriptName = "JKKayle"
 local sourceLibFound = true
@@ -81,7 +81,7 @@ function OnTick()
 	    JungleFarm()
 	end
 	if Menu.farm.LaneClear then
-	    LaneClear()
+	    farm()
 	end
 end
 
@@ -91,7 +91,8 @@ function Auto()
 			CastSpell(_Q,ts.target)
 		end
 		if E:IsReady() and E:IsInRange(ts.target, myHero) then
-            CastSpell(_E,ts.target)
+            CastSpell(_E)
+			myHero:Attack(ts.target)
 	end
 end
 end
@@ -108,29 +109,17 @@ function JungleFarm()
 					end
 				end
 				
-function LaneClear()
-				EnemyMinions:update()
-				for i, Minion in pairs(EnemyMinions.objects) do
-					if ValidTarget(Minion) then
-						if E:IsReady() and Menu.farm.LaneClear then
-							CastSpell(_E,Minion)
-						end
-					end
-				end
-				end
 				
 					
 
+					
 function harass()
 	if ts.target then
-		if E:IsReady() and E:IsInRange(ts.target, myHero) then
-            CastSpell(_E,ts.target)
-	end
-		end
 		if Q:IsReady() and Q:IsInRange(ts.target,myHero) then
 			CastSpell(_Q,ts.target)
 		end
-	end
+		end
+end
 
 function fullCombo()
 	if ts.target then
@@ -170,11 +159,11 @@ function UltManagement(unit)
 end
 
 
+
 function Damage(target)
   if target then
     local qDmg = getDmg("Q", target, myHero)
-    local wDmg = getDmg("W", target, myHero)
-    local rDmg = getDmg("R", target, myHero)
+    local eDmg = getDmg("E", target, myHero)
     local dfgDmg = (GetInventorySlotItem(3128) ~= nil and getDmg("DFG", target, myHero)) or 0
     local damageAmp = (GetInventorySlotItem(3128) ~= nil and 1.2) or 1
 		local currentDamage = 0
@@ -197,6 +186,40 @@ function Damage(target)
 		return currentDamage
   end
 	
+end
+
+local eWidth = 150
+
+function countminionshitE(pos, width)
+	local n = 0
+	for i, minion in ipairs(EnemyMinions.objects) do
+		if GetDistance(minion, pos) < width and minion.health <= getDmg("E", minion, myHero) then
+			n = n +1
+		end
+	end
+	return n
+end
+
+function GetBestEPositionFarm()
+	local MaxE = 0 
+	local MaxEPos 
+	for i, minion in pairs(EnemyMinions.objects) do
+		local hitE = countminionshitE(minion, eWidth)
+		if hitE > MaxE or MaxEPos == nil then
+			MaxEPos = minion
+			MaxE = hitE
+		end
+	end
+
+	if MaxEPos and MaxE then return MaxEPos, maxE end
+end
+
+function farm()
+	local minion, count = GetBestEPositionFarm()
+	if minion and count > 0 then 
+		CastSpell(_E)
+		myHero:Attack(minion)
+	end
 end
 
 function OnDraw()
