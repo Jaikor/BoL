@@ -1,7 +1,7 @@
 require "VPrediction"
 require "SOW"
 if myHero.charName ~= "Kayle" then return end
-local version = 2.2
+local version = 2.2.1
 local autoUpdate   = true
 local scriptName = "JKKayle"
 local sourceLibFound = true
@@ -22,6 +22,7 @@ end
 function OnLoad()
 	VP = VPrediction()
 	qRng, wRng, eRng, rRng = 650, 900, 525, 900
+	wBuffer = 400
 	EnemyMinions = minionManager(MINION_ENEMY, eRng, myHero, MINION_SORT_MAXHEALTH_DEC)
 	JungleMinions = minionManager(MINION_JUNGLE, eRng, myHero, MINION_SORT_MAXHEALTH_DEC)
 	Q = Spell(_Q, qRng)
@@ -46,6 +47,9 @@ function OnLoad()
 	
 	-- Options
 	Menu:addSubMenu("Configurations","options")
+	Menu.options:addParam("useW", "Use W", SCRIPT_PARAM_ONOFF, true)
+	Menu.options:addParam("HealHealth", "X Amount of Health to heal", SCRIPT_PARAM_SLICE, 0.6, 0.1, 0.9, 1)
+	Menu.options:addParam("HealMana", "X Amount of Mana to heal", SCRIPT_PARAM_SLICE, 0.4, 0.1, 1, 1)
 	Menu.options:addParam("useUlt", "Use Ult", SCRIPT_PARAM_ONOFF, true)
 	Menu.options:addParam("PercentofHealth", "PercentofHealth",SCRIPT_PARAM_SLICE, 25, 0, 100, 0)
 	-- Draw
@@ -132,14 +136,19 @@ function fullCombo()
 			CastSpell(_Q,ts.target)
 		end
 		-- Casting W
-		if W:IsReady() and W:IsInRange(ts.target,myHero) and Menu.options.useW then
-				if W:IsInRange(ts.target,myHero) > wBuffer and W:IsReady() then
-				 CastSpell(_W, myHero) end
-		end
-		-- Casting E
+		                if W:IsReady() and W:IsInRange(ts.target,myHero) then
+						if (myHero.health / myHero.maxHealth) < Menu.options.HealHealth then
+							CastSpell(_W)
+						end
+                end
+				if W:IsReady() and Menu.options.useW and GetDistance(ts.target)  > wBuffer then
+					CastSpell(_W,myHero)
+				end
+				-- Casting E
 		if E:IsReady() and E:IsInRange(ts.target, myHero) then
 				if GetDistance(ts.target) < 525 then
-             CastSpell(_E,ts.target)
+             CastSpell(_E)
+			 myHero:Attack(ts.target)
 		end
 		end
 		-- Casting R
@@ -158,6 +167,21 @@ function UltManagement(unit)
 	if unit.health <= unit.maxHealth*(Menu.options.PercentofHealth/100) and CountEnemyHeroInRange(650, unit) > 0 then CastSpell(_R, unit) end
 end
 
+function Healing()
+	if myHero.mana >= myHero.maxMana*Menu.options.HealMana then
+		for i=1, heroManager.iCount do
+			local allytarget = heroManager:GetHero(i)
+			if allytarget.team == myHero.team and not allytarget.dead then 
+				if GetDistance(allytarget) <= 900 and (allytarget.health / allytarget.maxHealth) < Menu.options.HealHealth then
+					if W:IsReady() and W:IsInRange() then 
+						CastSpell(_W, allytarget)
+							end
+					end
+				end
+			end
+		end
+	end
+		
 
 
 function Damage(target)
