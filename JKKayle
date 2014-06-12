@@ -1,7 +1,7 @@
 require "VPrediction"
 require "SOW"
 if myHero.charName ~= "Kayle" then return end
-local version = 2.2.1
+local version = 2.2
 local autoUpdate   = true
 local scriptName = "JKKayle"
 local sourceLibFound = true
