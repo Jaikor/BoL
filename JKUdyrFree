@@ -40,7 +40,6 @@ VP = VPrediction(true)
 OW = SOW(VP)
 OW:RegisterAfterAttackCallback(AutoAttackReset)
 TS = SimpleTS(STS_LESS_CAST_MAGIC)
-Selector.Instance()
 SpellQ = Spell(_Q, Udyr.Q["range"])
 SpellW = Spell(_W, Udyr.W["range"])
 SpellE = Spell(_E, Udyr.E["range"])
@@ -65,13 +64,6 @@ Menu.General:addParam("Combo","Combo",2,false,32)
 Menu.General:addParam("LaneClear","Lane Clear",2,false,string.byte("V"))
 Menu.General:addParam("JungleFarm","Jungle Farm",2,false,string.byte("G"))
 Menu.General:addParam("Flee","Ferrari Mode",2,false,string.byte("X"))
---}
---{ Target Selector
-Menu:addSubMenu("Udyr: Target Selector","TS")
-Menu.TS:addParam("TS","Target Selector",7,2,{ "AllClass", "SourceLib", "Selector", "SAC:Reborn", "MMA" })
-ts = TargetSelector(8,Udyr.Q["range"],1,false)
-ts.name = "AllClass TS"
-Menu.TS:addTS(ts)
 --}
 --{ Orbwalking
 Menu:addSubMenu("Udyr: Orbwalking","Orbwalking")
@@ -104,7 +96,7 @@ DrawHandler = DrawManager()
 DrawHandler:CreateCircle(myHero,Udyr.Q["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "Q Range", true, true, true):LinkWithSpell(SpellQ, true)
 DrawHandler:CreateCircle(myHero,Udyr.W["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "W Range", true, true, true):LinkWithSpell(SpellW, true)
 DrawHandler:CreateCircle(myHero,Udyr.E["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "E Range", true, true, true):LinkWithSpell(SpellE, true)
-DrawHandler:CreateCircle(myHero,Udyr.R["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "E Range", true, true, true):LinkWithSpell(SpellR, true)
+DrawHandler:CreateCircle(myHero,Udyr.R["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "R Range", true, true, true):LinkWithSpell(SpellR, true)
 DamageCalculator:AddToMenu(Menu.Draw,{_Q,_W,_E,_R,_AA})
 --}
 --{ Perma Show Settings
@@ -131,10 +123,15 @@ if Menu.Perma.JQ then Menu.JungleFarm:permaShow("JungleQ") end
 if Menu.Perma.JR then Menu.JungleFarm:permaShow("JungleR") end
 --}
 --}
+
+ts = TargetSelector(TARGET_LOW_HP_PRIORITY, 600, DAMAGE_PHYSICAL, true)
+ts.name = "Udyr"
+Menu:addTS(ts)
 end
 --}
 --{ Script Loop
 function OnTick()
+ts:update()
 --{ Variables
 QMANA = GetSpellData(_Q).mana
 WMANA = GetSpellData(_W).mana
@@ -148,7 +145,8 @@ QREADY = (SpellQ:IsReady() and ((Menu.General.Combo and Menu.Combo.Q) or (Menu.G
 WREADY = (SpellW:IsReady() and ((Menu.General.Combo and Menu.Combo.W) ))
 EREADY = (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.E) ))
 RREADY = (SpellR:IsReady() and ((Menu.General.Combo and Menu.Combo.R) or (Menu.General.JungleFarm and Menu.JungleFarm.JungleR) or (Farm and (Menu.Farm.R or Menu.Farm.Rclear)) ))
-Target = GrabTarget()
+Target = ts.target
+
 --}
 --{ Combo and Harass
 if Combat then
@@ -215,40 +213,7 @@ end
 end
 
 
---{ Target Selector
-function GrabTarget()
-if _G.MMA_Loaded and Menu.TS.TS == 5 then
-return _G.MMA_ConsideredTarget(MaxRange())
-elseif _G.AutoCarry and Menu.TS.TS == 4 then
-return _G.AutoCarry.Crosshair:GetTarget()
-elseif _G.Selector_Enabled and Menu.TS.TS == 3 then
-return Selector.GetTarget(SelectorMenu.Get().mode, 'AD', {distance = MaxRange()})
-elseif Menu.TS.TS == 2 then
-return TS:GetTarget(MaxRange())
-elseif Menu.TS.TS == 1 then
-ts.range = MaxRange()
-ts:update()
-return ts.target
-end
-end
---}
---{ Target Selector Range
-function MaxRange()
-if WREADY then
-return Udyr.W["range"]
-end
-if QREADY then
-return Udyr.Q["range"]
-end
-if RREADY then
-return Udyr.R["range"]
-end
-if EREADY then
-return Udyr.E["range"]
-end
-return myHero.range + 50
-end
---}
+
 
 function OnProcessSpell(unit, spell)
 if unit.isMe then
