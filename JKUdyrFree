@@ -35,6 +35,7 @@ local rLevel = myHero:GetSpellData(_R).level
 --}
 --{ Script Load
 function OnLoad()
+Target = ts.target
 --{ Variables
 VP = VPrediction(true)
 OW = SOW(VP)
@@ -145,7 +146,7 @@ QREADY = (SpellQ:IsReady() and ((Menu.General.Combo and Menu.Combo.Q) or (Menu.G
 WREADY = (SpellW:IsReady() and ((Menu.General.Combo and Menu.Combo.W) ))
 EREADY = (SpellE:IsReady() and ((Menu.General.Combo and Menu.Combo.E) ))
 RREADY = (SpellR:IsReady() and ((Menu.General.Combo and Menu.Combo.R) or (Menu.General.JungleFarm and Menu.JungleFarm.JungleR) or (Farm and (Menu.Farm.R or Menu.Farm.Rclear)) ))
-Target = ts.target
+
 
 --}
 --{ Combo and Harass
