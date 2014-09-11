@@ -1,4 +1,4 @@
-local version = 2.0
+local version = 2.1
 if not VIP_USER or myHero.charName ~= "Shen" then return end
 --{ Initiate Script (Checks for updates)
 	function Initiate()
@@ -12,7 +12,6 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 			return true
 		end
 		local libDownloader = Require(scriptName)
-		libDownloader:Add("Selector",	 "https://raw.github.com/LegendBot/Scripts/master/Common/Selector.lua")
 		libDownloader:Add("VPrediction", "https://raw.githubusercontent.com/Hellsing/BoL/master/common/VPrediction.lua")
 		libDownloader:Add("SOW",		 "https://raw.githubusercontent.com/Hellsing/BoL/master/common/SOW.lua")
 		libDownloader:Check()
@@ -60,7 +59,7 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 			--{ Target Selector			
 				Menu:addSubMenu("Shen: Target Selector","TS")
 				Menu.TS:addParam("TS","Target Selector",7,2,{ "AllClass", "SourceLib", "Selector (Disabled)", "SAC:Reborn", "MMA" })
-				ts = TargetSelector(8,Shen.R["range"],1,false)
+				ts = TargetSelector(TARGET_LESS_CAST_PRIORITY, Shen.Q["range"], DAMAGE_PHYSICAL, true)
 				ts.name = "AllClass TS"
 				Menu.TS:addTS(ts)				
 			--}
@@ -228,16 +227,47 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 	end
 --}
 
+--[[
 function UltManager()
+for i, ally in ipairs(GetAllyHeroes()) do
+if ally.visible and ally ~= nil and not ally.dead and HealthCheck(ally, Menu.Extra.PercentofHealth) then
+		PrintAlert(Ally.charName.." Warning Ally in Danger use R", Menu.Extra.ultAlert.alertTime, 128, 255, 0)
+
+if Menu.Extra.ultAlert.Pings and VIP_USER then
+Packet('R_PING',  { x = ally.x, y = ally.z, type = PING_FALLBACK }):receive()
+end
+end
+end
+end
+
+function HealthCheck(unit, HealthValue)
+ if unit.health < (unit.maxHealth * (HealthValue/100)) then 
+  return true
+ else
+  return false
+ end
+end
+
+]]--
+
+function HealthCheck(unit, HealthValue)
+ if unit.health < (unit.maxHealth * (HealthValue/100)) then 
+  return true
+ else
+  return false
+ end
+end
+
+function Ult()
 	for i = 1, allyCount do
 		local ally = allyTable[i].player
-		if ally.visible and ally ~= nil and not ally.dead then
-			if ally.health < ally.maxHealth*(Menu.Extra.PercentofHealth/100) and RREADY then
+		if ally.visible and ally ~= nil and not ally.dead and HealthCheck (ally, Menu.Extra.PercentofHealth) then
+			if ally.health < RREADY then
 				if not allyTable[i].ultAlert then
-					PrintAlert(ally.charName.." Champeon in Danger use R ", Menu.Extra.ultAlert.alertTime, 128, 255, 0)
+					PrintAlert(ally.charName.." Use Ult (R) ", Menu.Extra.ultAlert.alertTime, 128, 255, 0)
 
 					if Menu.Extra.ultAlert.Pings and VIP_USER then
-						Packet('R_PING',  { x = enemy.x, y = enemy.z, type = PING_FALLBACK }):receive()
+						Packet('R_PING',  { x = ally.x, y = ally.z, type = PING_FALLBACK }):receive()
 					end
 
 					allyTable[i].ultAlert = true
@@ -248,3 +278,5 @@ function UltManager()
 		end
 	end
 end
+
+
