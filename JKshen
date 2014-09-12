@@ -86,20 +86,13 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 				Menu:addSubMenu("Shen: Extra","Extra")
 			    Menu.Extra:addSubMenu("Info - Ultimate Alert", "ultAlert")
 				Menu.Extra:addParam("PercentofHealth", "Minimum Health %", SCRIPT_PARAM_SLICE, 50, 0, 100, -1)
-			    Menu.Extra.ultAlert:addParam("Enable", "Enable Ultimate Alert", SCRIPT_PARAM_ONOFF, true)
-			    Menu.Extra.ultAlert:addParam("alertTime", "Time to be shown: ", SCRIPT_PARAM_SLICE, 3, 1, 10, 0)
-			    if VIP_USER then
-				Menu.Extra.ultAlert:addParam("Pings", "Use Client-Side Pings to Alert", SCRIPT_PARAM_ONOFF, false)
-			end
-			    Menu.Extra.ultAlert:addParam("alertInfo", "It will print a text in the middle of the screen if an Enemy is Killable", SCRIPT_PARAM_INFO, "")
+				Menu.Extra.ultAlert:addParam("alert", "Alert about low health ally", SCRIPT_PARAM_ONOFF, true)
 			--}
 			--{ Draw Settings
 				Menu:addSubMenu("Shen: Draw","Draw")
 				DrawHandler = DrawManager()
 				DrawHandler:CreateCircle(myHero,Shen.Q["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "Q Range", true, true, true):LinkWithSpell(SpellQ, true)
 				DrawHandler:CreateCircle(myHero,Shen.E["range"],1,{255, 255, 255, 255}):AddToMenu(Menu.Draw, "E Range", true, true, true):LinkWithSpell(SpellE, true)
-				Menu.Draw:addSubMenu("Shen R","Ulti")
-				Menu.Ulti.alert:addParam("alert", "Alert about low health ally", SCRIPT_PARAM_ONOFF, true)
 				DamageCalculator:AddToMenu(Menu.Draw,{_Q,_E,_AA})
 			--}
 			--{ Perma Show Settings
@@ -136,6 +129,8 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 		--}
 	end
 --}
+
+
 --{ Script Loop
 	function OnTick()
 		--{ Variables
@@ -191,12 +186,12 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 			end
 		--}
 		
-
-			       if Menu.Ulti.alert then
+--[[
+			       if Menu.Extra.ultAlert.alert then
                    for i = 1, heroManager.iCount, 1 do
                    local hero = heroManager:getHero(i)
                    if hero.team == myHero.team then
-                                if (hero.health < HealthCheck) and ((GetTickCount() - LastAlert) > 30000)then
+                                if (hero.health <= HealthCheck) and ((GetTickCount() - LastAlert) > 30000)then
                                         PrintAlert("hero "..hero.charName.." is in Danger!", 3, 255, 0, 0,nil)
                                         LastAlert = GetTickCount()
                                         for i = 1, 3 do
@@ -206,7 +201,18 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
                         end
                 end	
 	end
+	--]]
 end
+
+--[[
+function HealthCheck(hero)
+	if hero.health <= hero.maxHealth*(Menu.Extra.PercentofHealth/100) then 
+	return true
+ else
+  return false
+ end
+end
+--]]
 
 --}
 
@@ -267,17 +273,28 @@ function HealthCheck(unit, HealthValue)
  end
 end
 
-]]--
 
-function HealthCheck(unit, HealthValue)
- if unit.health < (unit.maxHealth * (HealthValue/100)) then 
+
+function HealthCheck(hero)
+	if hero.health <= hero.maxHealth*(Menu.Extra.PercentofHealth/100) then 
+	return true
+ else
+  return false
+ end
+end
+--]]
+
+
+function HealthCheck(hero, HealthValue)
+ if hero.health < (hero.maxHealth * (HealthValue/100)) then 
   return true
  else
   return false
  end
 end
 
---[[
+
+
 function Ult()
 	for i = 1, allyCount do
 		local ally = allyTable[i].player
@@ -298,5 +315,5 @@ function Ult()
 		end
 	end
 end
---]]
+
 
