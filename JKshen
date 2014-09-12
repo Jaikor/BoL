@@ -190,14 +190,17 @@ if not VIP_USER or myHero.charName ~= "Shen" then return end
 				end
 			end
 		--}
+		
+
 			       if Menu.Ulti.alert then
-                for i, ally in ipairs(GetAllyHeroes()) do
-                        if ValidTarget(ally) then
-                                if (ally.health < HealthCheck) and ((GetTickCount() - LastAlert) > 30000)then
-                                        PrintAlert("ally "..ally.charName.." is in Danger!", 3, 255, 0, 0,nil)
+                   for i = 1, heroManager.iCount, 1 do
+                   local hero = heroManager:getHero(i)
+                   if hero.team == myHero.team then
+                                if (hero.health < HealthCheck) and ((GetTickCount() - LastAlert) > 30000)then
+                                        PrintAlert("hero "..hero.charName.." is in Danger!", 3, 255, 0, 0,nil)
                                         LastAlert = GetTickCount()
                                         for i = 1, 3 do
-                                                DelayAction(RecPing,  1000 * 0.3 * i/1000, {ally.x, ally.z})
+                                                DelayAction(RecPing,  1000 * 0.3 * i/1000, {hero.x, hero.z})
                                         end
                                 end
                         end
