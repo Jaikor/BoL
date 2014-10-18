@@ -1,5 +1,5 @@
 local version = 1.4
-if not VIP_USER or myHero.charName ~= "Udyr" then return end
+if myHero.charName ~= "Udyr" then return end
 
 	
 
