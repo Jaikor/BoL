@@ -1,4 +1,4 @@
-local version = 1.3
+local version = 1.4
 if not VIP_USER or myHero.charName ~= "Udyr" then return end
 --{ Initiate Script (Checks for updates)
 	function Initiate()
@@ -13,16 +13,20 @@ if not VIP_USER or myHero.charName ~= "Udyr" then return end
 		end
 		local libDownloader = Require(scriptName)
 		libDownloader:Add("Selector",	 "https://raw.github.com/LegendBot/Scripts/master/Common/Selector.lua")
-		libDownloader:Add("VPrediction", "https://raw.github.com/LegendBot/Scripts/master/Common/VPrediction.lua")
-		libDownloader:Add("SOW",		 "https://raw.github.com/LegendBot/Scripts/master/Common/SOW.lua")
+		libDownloader:Add("VPrediction", "https://raw.githubusercontent.com/Hellsing/BoL/master/common/VPrediction.lua")
+		libDownloader:Add("SOW",		 "https://raw.githubusercontent.com/Hellsing/BoL/master/common/SOW.lua")
 		libDownloader:Check()
 		if libDownloader.downloadNeeded then printMessage("Downloading required libraries, please wait whilst the required files are being downloaded.") return true end
 	    SourceUpdater(scriptName, version, "raw.github.com", "/Jaikor/BoL/master/JKUdyr.lua", SCRIPT_PATH..GetCurrentEnv().FILE_NAME, "/Jaikor/BoL/master/Versions/JKudyr.version"):CheckUpdate()
 		return false
 	end
+
+
+	
 	if Initiate() then return end
 	printMessage("Loaded")
 --}
+
 --{ Initiate Data Load
 	local Udyr = {
 		Q = {range = 600, speed = math.huge, delay = 0.5, DamageType = _PHYSICAL, BaseDamage = 30, DamagePerLevel = 50, ScalingStat = _PHYSICAL, PercentScaling = _AD, Condition = 0.15, Extra = function() return (myHero:CanUseSpell(_Q) == READY) end},
@@ -36,6 +40,7 @@ local rLevel = myHero:GetSpellData(_R).level
 --}
 --{ Script Load
 	function OnLoad()
+	    PrintChat("<font color='#690759'> >> JKUdyr Imba Shit V1.3!! <<</font>")
 		--{ Variables
 			VP = VPrediction(true)
 			OW = SOW(VP)
@@ -156,22 +161,29 @@ local rLevel = myHero:GetSpellData(_R).level
 			if Target and not Target.dead then
 		       if EREADY and not TargetHaveBuff("udyrbearstuncheck", Target) then
 			   CastSpell(_E)
+			   myHero:Attack(Target)
 		       end
 		    if (TargetHaveBuff("udyrbearstuncheck", Target) and myHero:GetSpellData(_E).level > 0 and GetDistance(Target) <= 400) or (myHero:GetSpellData(_E).level == 0 and GetDistance(Target) <= 400) then
 			if QREADY then
 				CastSpell(_Q)
+				myHero:Attack(Target)
 			end
 			if RREADY and myHero:GetSpellData(_Q).level >= 1 and Tiger and (AttackCount >= 2 or TigerProc == true) then
 				CastSpell(_R)
+				myHero:Attack(Target)
 			elseif myHero:GetSpellData(_Q).level == 0 then
 				CastSpell(_R)
+				myHero:Attack(Target)
 			end
 			if Phoenix == true and (AttackCount >= 3 or FlameBreath == true) then
 				CastSpell(_W)
+				myHero:Attack(Target)
 			elseif Tiger == true and (AttackCount >= 2 or TigerProc == true) then
 				CastSpell(_W)
+				myHero:Attack(Target)
 			elseif myHero:GetSpellData(_Q).level == 0 and myHero:GetSpellData(_R).level == 0 then
 				CastSpell(_W)
+				myHero:Attack(Target)
 			end
 					if Menu.Orbwalking.Enabled and (Menu.Orbwalking.Mode0 or Menu.Orbwalking.Mode1) then
 						OW:ForceTarget(Target)
@@ -215,7 +227,7 @@ local rLevel = myHero:GetSpellData(_R).level
 --}
 end
 
-
+--[[
 --{ Target Selector
 	function GrabTarget()
 		if _G.MMA_Loaded and Menu.TS.TS == 5 then
@@ -250,6 +262,7 @@ end
 		return myHero.range + 50
 	end
 --}
+--]]
 
 function OnProcessSpell(unit, spell)
   if unit.isMe then
