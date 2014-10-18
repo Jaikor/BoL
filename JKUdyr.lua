@@ -2,17 +2,16 @@ local version = 1.4
 if not VIP_USER or myHero.charName ~= "Udyr" then return end
 --{ Initiate Script (Checks for updates)
 	function Initiate()
-		local scriptName = "JKUdyr Imba Shit"
+		local scriptName = "JKUdyr"
 		printMessage = function(message) print("<font color=\"#690759\"><b>"..scriptName..":</b></font> <font color=\"#FFFFFF\">"..message.."</font>") end
 		if FileExist(LIB_PATH.."SourceLib.lua") then
 			require 'SourceLib'
 		else
 			printMessage("Downloading SourceLib, please wait whilst the required library is being downloaded.")
-			DownloadFile("https://raw.github.com/TheRealSource/public/master/common/SourceLib.lua",LIB_PATH.."SourceLib.lua", function() printMessage("SourceLib successfully downloaded, please reload (double [F9]).") end)
+			DownloadFile("https://raw.githubusercontent.com/Dienofail/BoL/master/common/SourceLib.lua",LIB_PATH.."SourceLib.lua", function() printMessage("SourceLib successfully downloaded, please reload (double [F9]).") end)
 			return true
 		end
 		local libDownloader = Require(scriptName)
-		libDownloader:Add("Selector",	 "https://raw.github.com/LegendBot/Scripts/master/Common/Selector.lua")
 		libDownloader:Add("VPrediction", "https://raw.githubusercontent.com/Hellsing/BoL/master/common/VPrediction.lua")
 		libDownloader:Add("SOW",		 "https://raw.githubusercontent.com/Hellsing/BoL/master/common/SOW.lua")
 		libDownloader:Check()
@@ -40,13 +39,12 @@ local rLevel = myHero:GetSpellData(_R).level
 --}
 --{ Script Load
 	function OnLoad()
-	    PrintChat("<font color='#690759'> >> JKUdyr Imba Shit V1.3!! <<</font>")
+	    PrintChat("<font color='#690759'> >> JKUdyr Imba Shit V1.4!! <<</font>")
 		--{ Variables
 			VP = VPrediction(true)
 			OW = SOW(VP)
 			OW:RegisterAfterAttackCallback(AutoAttackReset)
 			TS = SimpleTS(STS_LESS_CAST_MAGIC)
-			Selector.Instance()
 			SpellQ = Spell(_Q, Udyr.Q["range"])
 			SpellW = Spell(_W, Udyr.W["range"])
 			SpellE = Spell(_E, Udyr.E["range"])
@@ -227,7 +225,7 @@ local rLevel = myHero:GetSpellData(_R).level
 --}
 end
 
---[[
+
 --{ Target Selector
 	function GrabTarget()
 		if _G.MMA_Loaded and Menu.TS.TS == 5 then
@@ -262,7 +260,7 @@ end
 		return myHero.range + 50
 	end
 --}
---]]
+
 
 function OnProcessSpell(unit, spell)
   if unit.isMe then
