@@ -159,7 +159,6 @@ local rLevel = myHero:GetSpellData(_R).level
 			if Target and not Target.dead then
 		       if EREADY and not TargetHaveBuff("udyrbearstuncheck", Target) then
 			   CastSpell(_E)
-			   myHero:Attack(Target)
 		       end
 		    if (TargetHaveBuff("udyrbearstuncheck", Target) and myHero:GetSpellData(_E).level > 0 and GetDistance(Target) <= 400) or (myHero:GetSpellData(_E).level == 0 and GetDistance(Target) <= 400) then
 			if QREADY then
