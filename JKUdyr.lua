@@ -28,10 +28,10 @@ if myHero.charName ~= "Udyr" then return end
 
 --{ Initiate Data Load
 	local Udyr = {
-		Q = {range = 400, speed = math.huge, delay = 0.5, DamageType = _PHYSICAL, BaseDamage = 30, DamagePerLevel = 50, ScalingStat = _PHYSICAL, PercentScaling = _AD, Condition = 0.15, Extra = function() return (myHero:CanUseSpell(_Q) == READY) end},
-		W = {range = 400, speed = math.huge, delay = 0.5, DamageType = _PHYSICAL, BaseDamage = 0, DamagePerLevel = 0, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.0, Extra = function() return (myHero:CanUseSpell(_W) == READY) end},
-		E = {range = 400, speed = math.huge, delay = 0.5, DamageType = _PHYSICAL, BaseDamage = 30, DamagePerLevel = 20, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.2, Extra = function() return (myHero:CanUseSpell(_E) == READY) end},
-		R = {range = 400, speed = math.huge, delay = 0.5, DamageType = _MAGIC, BaseDamage = 75, DamagePerLevel = 50, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 1.25, Extra = function() return (myHero:CanUseSpell(_R) == READY) end}
+		Q = {range = 600, speed = math.huge, delay = 0.5, DamageType = _PHYSICAL, BaseDamage = 30, DamagePerLevel = 50, ScalingStat = _PHYSICAL, PercentScaling = _AD, Condition = 0.15, Extra = function() return (myHero:CanUseSpell(_Q) == READY) end},
+		W = {range = 600, speed = math.huge, delay = 0.5, DamageType = _PHYSICAL, BaseDamage = 0, DamagePerLevel = 0, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.0, Extra = function() return (myHero:CanUseSpell(_W) == READY) end},
+		E = {range = 600, speed = math.huge, delay = 0.5, DamageType = _PHYSICAL, BaseDamage = 30, DamagePerLevel = 20, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 0.2, Extra = function() return (myHero:CanUseSpell(_E) == READY) end},
+		R = {range = 600, speed = math.huge, delay = 0.5, DamageType = _MAGIC, BaseDamage = 75, DamagePerLevel = 50, ScalingStat = _MAGIC, PercentScaling = _AP, Condition = 1.25, Extra = function() return (myHero:CanUseSpell(_R) == READY) end}
 	}
 	
 local qLevel = myHero:GetSpellData(_Q).level
@@ -157,7 +157,7 @@ local rLevel = myHero:GetSpellData(_R).level
 		--{ Combo and Harass
 			if Combat then
 			if Target and not Target.dead then
-		       if EREADY and not TargetHaveBuff("udyrbearstuncheck", Target) and GetDistance (Target) <= 200 then
+		       if EREADY and not TargetHaveBuff("udyrbearstuncheck", Target) then
 			   CastSpell(_E)
 			   myHero:Attack(Target)
 		       end
