@@ -31,7 +31,6 @@ end
 
 
 function Menu()
-
 				--{ Initiate Menu
 			Menu = scriptConfig("Udyr","ImbaUdyr")
 			Menu:addParam("Author","Author: Jaikor",5,"")
@@ -73,18 +72,22 @@ function Menu()
 			
 		    --{ Permashow
 				Menu.General:permaShow("Combo")
-				Menu.General:permaShow("Farm")
-				Menu.General:permaShow("Laneclear")
+				Menu.General:permaShow("JungleFarm")
+				Menu.General:permaShow("LaneClear")
 end
 
 	
 function OnTick()
 	if initDone then
 		Check()
-	    Farm = Menu.General.LaneClear and Menu.Farm.Mana <= myHero.mana / myHero.maxMana * 100
-		JungleFarm = Menu.General.JungleFarm
-		Combat = Menu.General.Combo
-	--  Flee = Menu.General.Flee
+			QMANA = GetSpellData(_Q).mana
+			WMANA = GetSpellData(_W).mana
+			EMANA = GetSpellData(_E).mana
+			RMANA = GetSpellData(_R).mana
+			Farm = Menu.General.LaneClear and Menu.Farm.Mana <= myHero.mana / myHero.maxMana * 100
+			JungleFarm = Menu.General.JungleFarm
+			Combat = Menu.General.Combo
+			Flee = Menu.General.Flee
 		Target = ts.target
 		--{ Combo and Harass
 			if Combat then
@@ -130,10 +133,10 @@ function OnTick()
 		--{ Jungle Farming
 			if JungleFarm then
 				JungleMinions:update()
-					JungleCreep = JungleMinions.objects[1]
-					if ValidTarget(JungleCreep) then
-                        if QREADY then 
-							CastSpell(_Q)
+				JungleCreep = JungleMinions.objects[1]
+				if ValidTarget(JungleCreep) then
+                    if QREADY then 
+					    CastSpell(_Q)
                     elseif RREADY and (not QREADY or myHero:GetSpellData(_Q).level < 1) then
 						CastSpell(_R)
                     end
@@ -141,7 +144,7 @@ function OnTick()
 			end
 		--}	
 --}
-end
+	end
 end
 
 function Check()
