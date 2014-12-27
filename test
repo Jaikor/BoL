@@ -17,6 +17,7 @@ local QREADY, WREADY, EREADY, RREADY = nil, nil, nil, nil
 function OnLoad()
     Menu()
     Init()
+	DelayAction(OrbwalkCheck, 1)
     SxOrb:LoadToMenu(Menu.Orbwalking)
 	PrintChat("<font color=\"#81BEF7\">>> JKUdyr Imba Shit V1.5!!loaded</font>")
 end
@@ -88,29 +89,22 @@ function OnTick()
 			if Combat then
 			if Target and not Target.dead then
 		       if EREADY and not TargetHaveBuff("udyrbearstuncheck", Target) then
-			   CastSpell(_E)
 		       end
 		    if (TargetHaveBuff("udyrbearstuncheck", Target) and myHero:GetSpellData(_E).level > 0 and GetDistance(Target) <= 400) or (myHero:GetSpellData(_E).level == 0 and GetDistance(Target) <= 400) then
 			if QREADY then
 				CastSpell(_Q)
-				myHero:Attack(Target)
 			end
 			if RREADY and myHero:GetSpellData(_Q).level >= 1 and Tiger and (AttackCount >= 2 or TigerProc == true) then
 				CastSpell(_R)
-				myHero:Attack(Target)
 			elseif myHero:GetSpellData(_Q).level == 0 then
 				CastSpell(_R)
-				myHero:Attack(Target)
 			end
 			if Phoenix == true and (AttackCount >= 3 or FlameBreath == true) then
 				CastSpell(_W)
-				myHero:Attack(Target)
 			elseif Tiger == true and (AttackCount >= 2 or TigerProc == true) then
 				CastSpell(_W)
-				myHero:Attack(Target)
 			elseif myHero:GetSpellData(_Q).level == 0 and myHero:GetSpellData(_R).level == 0 then
 				CastSpell(_W)
-				myHero:Attack(Target)
 			end
 		
 		end
@@ -122,13 +116,11 @@ function OnTick()
 				EnemyMinions:update()
 				for i, Minion in pairs(EnemyMinions.objects) do
 					if ValidTarget(Minion) then
-						if QREADY and (DamageCalculator:IsKillable(Minion,{_Q}) or Menu.General.LaneClear) then
-							SpellQ:Cast(Minion)
-							   myHero:Attack(Minion)
+						if QREADY and Menu.General.LaneClear then
+							CastSpell(_Q)
 						end
-						if RREADY and (DamageCalculator:IsKillable(Minion,{_R}) or Menu.General.LaneClear) then
-							SpellR:Cast(Minion)
-							   myHero:Attack(Minion)
+						if RREADY and Menu.General.LaneClear then
+							CastSpell(_R)
 						end
 					end
 				end
@@ -140,11 +132,9 @@ function OnTick()
 					JungleCreep = JungleMinions.objects[1]
 					if ValidTarget(JungleCreep) then
                     if QREADY then 
-                    SpellQ:Cast(JungleCreep)
-					myHero:Attack(JungleCreep)
+                    CastSpell(_Q)
                     elseif RREADY and (not QREADY or myHero:GetSpellData(_Q).level < 1) then
-                    SpellR:Cast(JungleCreep)
-					myHero:Attack(JungleCreep)
+                    CastSpell(_R)
                     end
 					end
 				end
@@ -154,7 +144,25 @@ end
 end
 
 
-
+function OrbwalkCheck()
+ if _G.AutoCarry then
+  sacused = true
+  Menu.Orbwalking:addParam("info11","SAC Detected", SCRIPT_PARAM_INFO, "")
+ elseif _G.Reborn_Loaded then
+  DelayAction(OrbwalkCheck, 1)
+ elseif _G.MMA_Loaded then
+  Menu.Orbwalking:addParam("info11","MMA Detected", SCRIPT_PARAM_INFO, "")
+  mmaused = true
+ else
+  SxOrb:LoadToMenu(Menu.Orbwalking, false) 
+  sxorbused = true
+  DelayAction(function()  
+   if SxOrb.Version < 2.07 then
+    script_Messager("Your SxOrbWalk library is outdated, please redownload it manually!")
+   end
+  end, 5)
+ end
+end
 
 function OnProcessSpell(unit, spell)
   if unit.isMe then
