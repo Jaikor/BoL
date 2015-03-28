@@ -95,24 +95,24 @@ function OnTick()
 		--{ Combo and Harass
 		if Combat then
 			if Target and not Target.dead then
-				if EREADY not TargetHaveBuff("udyrbearstuncheck", Target) and Menu.Combo.E then
+				if EREADY and Menu.Combo.E and not TargetHaveBuff("udyrbearstuncheck", Target) then
 					CastSpell(_E)
 				end
-				if (TargetHaveBuff("udyrbearstuncheck", Target) and myHero:GetSpellData(_E).level > 0 and GetDistance(Target) <= 400) or (myHero:GetSpellData(_E).level == 0 and GetDistance(Target) <= 400) then
+				if QREADY and Menu.Combo.Q and (TargetHaveBuff("udyrbearstuncheck", Target) and myHero:GetSpellData(_E).level > 0 and GetDistance(Target) <= 400) or (myHero:GetSpellData(_E).level == 0 and GetDistance(Target) <= 400) then
 					--print("3")
-					if QREADY and Combo.Menu.Q then
+					if QREADY then
 						CastSpell(_Q)
 					end
-					if RREADY and myHero:GetSpellData(_Q).level >= 1 and Tiger and (AttackCount >= 2 or TigerProc == true) and Menu.Combo.R then
+					if RREADY and Menu.Combo.R and myHero:GetSpellData(_Q).level >= 1 and Tiger and (AttackCount >= 2 or TigerProc == true) and Menu.Combo.R then
 						CastSpell(_R)
-					elseif myHero:GetSpellData(_Q).level == 0 and Menu.Combo.R then
+					elseif myHero:GetSpellData(_Q).level == 0 then
 						CastSpell(_R)
 					end
-					if Phoenix == true and (AttackCount >= 3 or FlameBreath == true) and Menu.Combo.W then
+					if Phoenix == true and (AttackCount >= 3 or FlameBreath == true) then
 						CastSpell(_W)
-					elseif Tiger == true and (AttackCount >= 2 or TigerProc == true) and Menu.Combo.W then
+					elseif Tiger == true and (AttackCount >= 2 or TigerProc == true) then
 						CastSpell(_W)
-					elseif myHero:GetSpellData(_Q).level == 0 and myHero:GetSpellData(_R).level == 0 and Menu.Combo.W then
+					elseif myHero:GetSpellData(_Q).level == 0 and myHero:GetSpellData(_R).level == 0 then
 						CastSpell(_W)
 					end
 		
