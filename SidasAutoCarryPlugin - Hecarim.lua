@@ -1,5 +1,5 @@
 --[[
-	AutoCarry Plugin - Hecarim The Shadow Of War 1.1 by Jaikor & Skeem
+	AutoCarry Plugin - Hecarim The Shadow Of War 1.3 by Jaikor & Skeem
 	With Code from Kain
 	Auto Level from Dekaron
 	AoE Skillshot by monogato
@@ -14,6 +14,7 @@
    1.2 - Fixed typo in menu 
          Added Scriptstatus.net 
          Removed Auto Level skills
+   1.3 - Added a slider to W range ;) 
 		 
 		 
  ]] --
@@ -227,6 +228,8 @@ function CountEnemies(point, range)
         return ChampCount
 end
 
+
+
 function CastR(Target)
     if RREADY then
                 local ultPos = GetAoESpellPosition(300, Target)
@@ -242,9 +245,9 @@ end
 function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
-			 if Menu.useQ and GetDistance(Target) <= eRange then CastSpell(_E) end                              
-			 if Menu.useW and GetDistance(Target) <= wRange then CastSpell(_W) end
-			 if Menu.useE and GetDistance(Target) <= qRange then CastSpell(_Q) end
+			 if Menu.useE and GetDistance(Target) <= eRange then CastSpell(_E) end                              
+			 if Menu.useW and GetDistance(Target) <= menu.wRange then CastSpell(_W) end
+			 if Menu.useQ and GetDistance(Target) <= qRange then CastSpell(_Q) end
 			 if Menu.useR and GetDistance(Target) <= rRange then CastR(Target) end
 		end
 	end
@@ -264,10 +267,11 @@ end
 
 --[Variables Load]--
 function mainLoad()
+    PrintChat("<font color='#690759'> >> Hecarim the Shadow Of Ware v1.3 Loaded! By Jaikor !!</font>")
 	if AutoCarry.Skills then IsSACReborn = true else IsSACReborn = false end
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
-	qRange,wRange,eRange,rRange = 350, 525, 800, 1000
+	qRange,eRange,rRange = 350, 800, 1000
 	QREADY, WREADY, EREADY, RREADY = false, false, false, false
 	qName, wName, eName, rName = "Rampage", "Spirit of Dread", "Devastating Charge", "Onslaught of Shadows"
 	HK1, HK2, HK3 = string.byte("Z"), string.byte("K"), string.byte("G")
@@ -290,6 +294,7 @@ function mainMenu()
 	Menu:addParam("sep1", "-- Full Combo Options --", SCRIPT_PARAM_INFO, "")
 	Menu:addParam("useQ", "Use "..qName.." (Q)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("useW", "Use "..wName.." (W)", SCRIPT_PARAM_ONOFF, true)
+	Menu:addParam("wRange", "Adjust "..wName.." (W)", SCRIPT_PARAM_SLICE, 380, 0, 525, -1)
 	Menu:addParam("useE", "Use "..eName.." (E)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("useR", "Use "..rName.." (R)", SCRIPT_PARAM_ONOFF, true)
 	Menu:addParam("sep2", "-- Mixed Mode Options --", SCRIPT_PARAM_INFO, "")
