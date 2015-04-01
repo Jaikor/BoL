@@ -261,13 +261,13 @@ function JungleClear()
 	end
 	if JungleMob ~= nil and not IsMyManaLow() then
 		if Extras.JungleQ and GetDistance(JungleMob) <= qRange then CastSpell(_Q) end
-		if Extras.JungleW and GetDistance(JungleMob) <= wRange then CastSpell(_W) end
+		if Extras.JungleW and GetDistance(JungleMob) <= Menu.wRange then CastSpell(_W) end
 	end
 end
 
 --[Variables Load]--
 function mainLoad()
-    PrintChat("<font color='#690759'> >> Hecarim the Shadow Of Ware v1.3 Loaded! By Jaikor !!</font>")
+  --  PrintChat("<font color='#690759'> >> Hecarim the Shadow Of Ware v1.3 Loaded! By Jaikor !!</font>")
 	if AutoCarry.Skills then IsSACReborn = true else IsSACReborn = false end
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
