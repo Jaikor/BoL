@@ -58,7 +58,7 @@ end
 function PluginOnDraw()
 	if not myHero.dead then
 		if WREADY and Menu.wDraw then 
-			DrawCircle(myHero.x, myHero.y, myHero.z, wRange, 0x191970)
+			DrawCircle(myHero.x, myHero.y, myHero.z, Menu.wRange, 0x191970)
 		end
 		if Menu.cDraw then
 			for i=1, heroManager.iCount do
