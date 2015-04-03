@@ -28,6 +28,7 @@ assert(load(Base64Decode("G0x1YVIAAQQEBAgAGZMNChoKAAAAAAAAAAAAAQIKAAAABgBAAEFAAA
 function PluginOnLoad()
 	mainLoad() -- Loads our Variable Function
 	mainMenu() -- Loads our Menu function
+    PrintChat("<font color=\"#A10A3C\">>> Hecarim The Shadow Of War Loaded By Jaikor V1.3 !!!</font>")
 end
 
 --[OnTick]--
@@ -267,7 +268,6 @@ end
 
 --[Variables Load]--
 function mainLoad()
-  --  PrintChat("<font color='#690759'> >> Hecarim the Shadow Of Ware v1.3 Loaded! By Jaikor !!</font>")
 	if AutoCarry.Skills then IsSACReborn = true else IsSACReborn = false end
 	if IsSACReborn then AutoCarry.Skills:DisableAll() end
 	Carry = AutoCarry.MainMenu
