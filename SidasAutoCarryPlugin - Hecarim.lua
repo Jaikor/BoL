@@ -246,7 +246,7 @@ function FullCombo()
 	if Target then
 		if AutoCarry.MainMenu.AutoCarry then
 			 if Menu.useE and GetDistance(Target) <= eRange then CastSpell(_E) end                              
-			 if Menu.useW and GetDistance(Target) <= menu.wRange then CastSpell(_W) end
+			 if Menu.useW and GetDistance(Target) <= Menu.wRange then CastSpell(_W) end
 			 if Menu.useQ and GetDistance(Target) <= qRange then CastSpell(_Q) end
 			 if Menu.useR and GetDistance(Target) <= rRange then CastR(Target) end
 		end
