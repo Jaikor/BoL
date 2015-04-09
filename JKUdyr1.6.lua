@@ -19,7 +19,7 @@ function OnLoad()
 	Menu()
     Init()
 	
-	PrintChat("<font color=\"#81BEF7\">>> JKUdyr Imba Shit V1.5!!loaded</font>")
+	PrintChat("<font color=\"#81BEF7\">>> JKUdyr Imba Shit V1.6!!loaded</font>")
 end
 
 function Init()
