@@ -3,7 +3,7 @@
 local autoUpdate   = false
 local silentUpdate = false
 
-local version = 1.2 -- 1.2 by dienofail to fix bilbao's fix of other people's fix of honda's stuff
+local version = 4.2 -- 1.2 by dienofail to fix bilbao's fix of other people's fix of honda's stuff
 
 --[[
     Introduction:
@@ -692,7 +692,7 @@ function Spell:CastIfDashing(target)
         local isDashing, canHit, position = self.VP:IsDashing(target, self.delay + 0.07 + GetLatency() / 2000, self.width, self.speed, self.sourcePosition)
 
         -- Out of range
-        if self.rangeSqr < _GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
+        if self.rangeSqr < GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
 
         if isDashing and canHit then
 
@@ -709,7 +709,7 @@ function Spell:CastIfDashing(target)
         local isDashing, canHit, position = self.VP:IsDashing(target, 0.25 + 0.07 + GetLatency() / 2000, 1, math.huge, self.sourcePosition)
 
         -- Out of range
-        if self.rangeSqr < _GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
+        if self.rangeSqr < GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
 
         if isDashing and canHit then
             return self:__Cast(position.x, position.z)
@@ -736,7 +736,7 @@ function Spell:CastIfImmobile(target)
         local isImmobile, position = self.VP:IsImmobile(target, self.delay + 0.07 + GetLatency() / 2000, self.width, self.speed, self.sourcePosition)
 
         -- Out of range
-        if self.rangeSqr < _GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
+        if self.rangeSqr < GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
 
         if isImmobile then
 
@@ -752,7 +752,7 @@ function Spell:CastIfImmobile(target)
         local isImmobile, position = self.VP:IsImmobile(target, 0.25 + 0.07 + GetLatency() / 2000, 1, math.huge, self.sourcePosition)
 
         -- Out of range
-        if self.rangeSqr < _GetDistanceSqr(self.sourceRange, target) then return SPELLSTATE_OUT_OF_RANGE end
+        if self.rangeSqr < GetDistanceSqr(self.sourceRange, target) then return SPELLSTATE_OUT_OF_RANGE end
 
         if isImmobile then
             return self:__Cast(target)
@@ -786,7 +786,7 @@ function Spell:Cast(param1, param2)
             else
                 castPosition, hitChance, position = self:GetPrediction(param1)
                 -- Out of range
-                if self.rangeSqr < _GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
+                if self.rangeSqr < GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
             end
         elseif self.skillshotType == SKILLSHOT_CIRCULAR then
             if self.useAoe then
@@ -794,7 +794,7 @@ function Spell:Cast(param1, param2)
             else
                 castPosition, hitChance, position = self:GetPrediction(param1)
                 -- Out of range
-                if math.pow(self.range + self.width + self.VP:GetHitBox(param1), 2) < _GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
+                if math.pow(self.range + self.width + self.VP:GetHitBox(param1), 2) < GetDistanceSqr(self.sourceRange, position) then return SPELLSTATE_OUT_OF_RANGE end
             end
         end
 
@@ -811,7 +811,7 @@ function Spell:Cast(param1, param2)
         if hitChance and hitChance < self.hitChance then return SPELLSTATE_LOWER_HITCHANCE end
 
         -- Out of range
-        if self.rangeSqr < _GetDistanceSqr(self.sourceRange, castPosition) then return SPELLSTATE_OUT_OF_RANGE end
+        if self.rangeSqr < GetDistanceSqr(self.sourceRange, castPosition) then return SPELLSTATE_OUT_OF_RANGE end
 
         param1 = castPosition.x
         param2 = castPosition.z
@@ -821,8 +821,8 @@ function Spell:Cast(param1, param2)
     if param1 ~= nil and param2 ~= nil and self.__charged and self:IsCharging() then
         --print("Sending xerath Q")
         local p = CLoLPacket(0xE6) 
-        p:EncodeF(myHero.networkID)
-        p:Encode1(0xEA)
+        p:EncodeF(player.networkID)
+        p:Encode1(0xE2)
         p:Encode1(0)
         p:EncodeF(param1)
         p:EncodeF(0)
@@ -984,7 +984,7 @@ end
     @return | bool | In range or not
 ]]
 function Spell:IsInRange(target, from)
-    return self.rangeSqr >= _GetDistanceSqr(target, from or self.sourcePosition)
+    return self.rangeSqr >= GetDistanceSqr(target, from or self.sourcePosition)
 end
 
 --[[
@@ -1820,7 +1820,7 @@ function STS_GET_PRIORITY(target)
 end
 
 STS_MENU = nil
-STS_NEARMOUSE                     = {id = 1, name = "Near mouse", sortfunc = function(a, b) return _GetDistanceSqr(mousePos, a) < _GetDistanceSqr(mousePos, b) end}
+STS_NEARMOUSE                     = {id = 1, name = "Near mouse", sortfunc = function(a, b) return GetDistanceSqr(mousePos, a) < GetDistanceSqr(mousePos, b) end}
 STS_LESS_CAST_MAGIC               = {id = 2, name = "Less cast (magic)", sortfunc = function(a, b) return (player:CalcMagicDamage(a, 100) / a.health) > (player:CalcMagicDamage(b, 100) / b.health) end}
 STS_LESS_CAST_PHYSICAL            = {id = 3, name = "Less cast (physical)", sortfunc = function(a, b) return (player:CalcDamage(a, 100) / a.health) > (player:CalcDamage(b, 100) / b.health) end}
 STS_PRIORITY_LESS_CAST_MAGIC      = {id = 4, name = "Less cast priority (magic)", sortfunc = function(a, b) return STS_GET_PRIORITY(a) * (player:CalcMagicDamage(a, 100) / a.health) > STS_GET_PRIORITY(b) * (player:CalcMagicDamage(b, 100) / b.health) end}
@@ -1834,7 +1834,7 @@ function SimpleTS:__init(mode)
 end
 
 function SimpleTS:IsValid(target, range, selected)
-    if ValidTarget(target) and (_GetDistanceSqr(target) <= range or (self.hitboxmode and (_GetDistanceSqr(target) <= (math.sqrt(range) + self.VP:GetHitBox(myHero) + self.VP:GetHitBox(target)) ^ 2))) then
+    if ValidTarget(target) and (GetDistanceSqr(target) <= range or (self.hitboxmode and (GetDistanceSqr(target) <= (math.sqrt(range) + self.VP:GetHitBox(myHero) + self.VP:GetHitBox(target)) ^ 2))) then
         if selected or (not (HasBuff(target, "UndyingRage") and (target.health == 1)) and not HasBuff(target, "JudicatorIntervention")) then
             return true
         end
@@ -1868,8 +1868,8 @@ function SimpleTS:OnMsg(msg, key)
         local SelectedTarget
         for i, enemy in ipairs(GetEnemyHeroes()) do
             if ValidTarget(enemy) then
-                if _GetDistanceSqr(enemy, mousePos) <= MinimumDistance then
-                    MinimumDistance = _GetDistanceSqr(enemy, mousePos)
+                if GetDistanceSqr(enemy, mousePos) <= MinimumDistance then
+                    MinimumDistance = GetDistanceSqr(enemy, mousePos)
                     SelectedTarget = enemy
                 end
             end
@@ -2077,7 +2077,7 @@ end
     @return       | boolean | In range or not
 ]]
 function Item:InRange(target)
-    return _GetDistanceSqr(target) <= self.rangeSqr
+    return GetDistanceSqr(target) <= self.rangeSqr
 end
 
 --[[
@@ -2479,13 +2479,13 @@ function AntiGapcloser:OnProcessSpell(unit, spell)
                 local add = false
                 if spell.target and spell.target.isMe then
                     add = true
-                    startPos = Vector(unit.visionPos)
+                    startPos = Vector(unit.pos)
                     endPos = myHero
                 elseif not spell.target then
-                    local endPos1 = Vector(unit.visionPos) + 300 * (Vector(spell.endPos) - Vector(unit.visionPos)):normalized()
-                    local endPos2 = Vector(unit.visionPos) + 100 * (Vector(spell.endPos) - Vector(unit.visionPos)):normalized()
+                    local endPos1 = Vector(unit.pos) + 300 * (Vector(spell.endPos) - Vector(unit.pos)):normalized()
+                    local endPos2 = Vector(unit.pos) + 100 * (Vector(spell.endPos) - Vector(unit.pos)):normalized()
                     --TODO check angles etc
-                    if (_GetDistanceSqr(myHero.visionPos, unit.visionPos) > _GetDistanceSqr(myHero.visionPos, endPos1) or _GetDistanceSqr(myHero.visionPos, unit.visionPos) > _GetDistanceSqr(myHero.visionPos, endPos2))  then
+                    if (GetDistanceSqr(myHero.pos, unit.pos) > GetDistanceSqr(myHero.pos, endPos1) or GetDistanceSqr(myHero.pos, unit.pos) > GetDistanceSqr(myHero.pos, endPos2))  then
                         add = true
                     end
                 end
@@ -2779,15 +2779,6 @@ function ProtectTable(t)
 
 end
 
-function _GetDistanceSqr(p1, p2)
-
-    p2 = p2 or player
-    if p1 and p1.networkID and (p1.networkID ~= 0) and p1.visionPos then p1 = p1.visionPos end
-    if p2 and p2.networkID and (p2.networkID ~= 0) and p2.visionPos then p2 = p2.visionPos end
-    return GetDistanceSqr(p1, p2)
-    
-end
-
 function GetObjectsAround(radius, position, condition)
 
     radius = math.pow(radius, 2)
@@ -2795,7 +2786,7 @@ function GetObjectsAround(radius, position, condition)
     local objectsAround = {}
     for i = 1, objManager.maxObjects do
         local object = objManager:getObject(i)
-        if object and object.valid and (condition and condition(object) == true or not condition) and _GetDistanceSqr(position, object) <= radius then
+        if object and object.valid and (condition and condition(object) == true or not condition) and GetDistanceSqr(position, object) <= radius then
             table.insert(objectsAround, object)
         end
     end
@@ -2858,7 +2849,7 @@ function CountObjectsNearPos(pos, range, radius, objects)
 
     local n = 0
     for i, object in ipairs(objects) do
-        if _GetDistanceSqr(pos, object) <= radius * radius then
+        if GetDistanceSqr(pos, object) <= radius * radius then
             n = n + 1
         end
     end
@@ -2872,7 +2863,7 @@ function GetBestCircularFarmPosition(range, radius, objects)
     local BestPos 
     local BestHit = 0
     for i, object in ipairs(objects) do
-        local hit = CountObjectsNearPos(object.visionPos or object, range, radius, objects)
+        local hit = CountObjectsNearPos(object.pos or object, range, radius, objects)
         if hit > BestHit then
             BestHit = hit
             BestPos = Vector(object)
@@ -2905,8 +2896,8 @@ function GetBestLineFarmPosition(range, width, objects)
     local BestPos 
     local BestHit = 0
     for i, object in ipairs(objects) do
-        local EndPos = Vector(myHero.visionPos) + range * (Vector(object) - Vector(myHero.visionPos)):normalized()
-        local hit = CountObjectsOnLineSegment(myHero.visionPos, EndPos, width, objects)
+        local EndPos = Vector(myHero.pos) + range * (Vector(object) - Vector(myHero.pos)):normalized()
+        local hit = CountObjectsOnLineSegment(myHero.pos, EndPos, width, objects)
         if hit > BestHit then
             BestHit = hit
             BestPos = Vector(object)
@@ -3035,7 +3026,7 @@ end
 
 -- Update script
 if autoUpdate then
-    SourceUpdater("SourceLib", version, "raw.github.com", "/TheRealSource/public/master/common/SourceLib.lua", LIB_PATH .. "SourceLib.lua", "/TheRealSource/public/master/common/SourceLib.version"):SetSilent(silentUpdate):CheckUpdate()
+    SourceUpdater("SourceLib", version, "raw.github.com", "/gbilbao/Bilbao/master/BoL1/Common/SourceLib.lua", LIB_PATH .. "SourceLib.lua", "/gbilbao/Bilbao/master/BoL1/Common/SourceLib.version"):SetSilent(silentUpdate):CheckUpdate()
 end
 
 -- Set enemy bar data
