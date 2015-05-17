@@ -1,4 +1,4 @@
-local VERSION = "1.6"
+local VERSION = "1.5"
 if myHero.charName ~= "Udyr" then return end
 
  require 'SxOrbWalk'
@@ -19,7 +19,7 @@ function OnLoad()
 	Menu()
     Init()
 	
-	PrintChat("<font color=\"#81BEF7\">>> JKUdyr Imba Shit V1.6!!loaded</font>")
+	PrintChat("<font color=\"#81BEF7\">>> JKUdyr Imba Shit V1.5!!loaded</font>")
 end
 
 function Init()
@@ -90,27 +90,27 @@ function OnTick()
 			JungleFarm = Menu.General.JungleFarm
 			Combat = Menu.General.Combo
 			Flee = Menu.General.Flee
-		ts:update()
-		Target = ts.target
+		--ts:update()
+        Target = GetTarget()
+        if Target then
 		--{ Combo and Harass
 		if Combat then
 			if Target and not Target.dead then
-				if EREADY and Menu.Combo.E and not TargetHaveBuff("udyrbearstuncheck", Target) then
+				if Menu.Combo.E and EREADY and not TargetHaveBuff("udyrbearstuncheck", Target) then
 					CastSpell(_E)
 				end
-				if QREADY and Menu.Combo.Q and (TargetHaveBuff("udyrbearstuncheck", Target) and myHero:GetSpellData(_E).level > 0 and GetDistance(Target) <= 400) or (myHero:GetSpellData(_E).level == 0 and GetDistance(Target) <= 400) then
-					--print("3")
-					if QREADY then
+				if (TargetHaveBuff("udyrbearstuncheck", Target) and myHero:GetSpellData(_E).level > 0 and GetDistance(Target) <= 400) or (myHero:GetSpellData(_E).level == 0 and GetDistance(Target) <= 400) then
+					if Menu.Combo.Q and QREADY and (not Phoenix or (Phoenix and AttackCount < 3)) then
 						CastSpell(_Q)
 					end
-					if RREADY and Menu.Combo.R and myHero:GetSpellData(_Q).level >= 1 and Tiger and (AttackCount >= 2 or TigerProc == true) and Menu.Combo.R then
+					if Menu.Combo.R and RREADY and myHero:GetSpellData(_Q).level >= 1 and Tiger and (AttackCount >= 1 or TigerProc == true) then
 						CastSpell(_R)
 					elseif myHero:GetSpellData(_Q).level == 0 then
 						CastSpell(_R)
 					end
-					if Phoenix == true and (AttackCount >= 3 or FlameBreath == true) then
+					if Phoenix == true and (AttackCount < 3 or FlameBreath == true) then
 						CastSpell(_W)
-					elseif Tiger == true and (AttackCount >= 2 or TigerProc == true) then
+					elseif Tiger == true and (AttackCount >= 1 or TigerProc == true) then
 						CastSpell(_W)
 					elseif myHero:GetSpellData(_Q).level == 0 and myHero:GetSpellData(_R).level == 0 then
 						CastSpell(_W)
@@ -119,6 +119,7 @@ function OnTick()
 				end
 			end
 		end
+        end
 		--}	
 		--{ Farming
 		if Farm then
@@ -140,9 +141,10 @@ function OnTick()
 			JungleMinions:update()
 			JungleCreep = JungleMinions.objects[1]
 			if ValidTarget(JungleCreep) then
-				if QREADY then 
+			
+				if QREADY and (not Phoenix or (Phoenix and AttackCount < 3)) then 
 					CastSpell(_Q)
-				elseif RREADY and (not QREADY or myHero:GetSpellData(_Q).level < 1) then
+				elseif RREADY and (not QREADY or myHero:GetSpellData(_Q).level < 1) and (not Tiger or (Tiger and AttackCount >= 1)) then
 					CastSpell(_R)
 				end
 			end
@@ -179,31 +181,39 @@ function OrbwalkCheck()
  end
 end
 
+    function GetTarget()
+        ts:update()
+        if _G.MMA_Target and _G.MMA_Target.type == myHero.type then 
+            return _G.MMA_Target 
+        elseif _G.Reborn_Initialised then
+            return _G.AutoCarry.Crosshair:GetTarget()
+        elseif ts.target and ValidTarget(ts.target) then
+            return ts.target
+        end
+    end
+
+
 function OnProcessSpell(unit, spell)
   if unit.isMe then
 		if spell and spell.name == myHero:GetSpellData(_Q).name then
 			Tiger, Turtle, Bear, Phoenix = true, false, false, false
-			AttackCount, TurtleCount = 0, 0
+			AttackCount = 0
 		end
 		if spell and spell.name == myHero:GetSpellData(_W).name then
 			Tiger, Turtle, Bear, Phoenix = false, true, false, false
-			AttackCount, TurtleCount = 0, 0
+			AttackCount = 0
 		end
 		if spell and spell.name == myHero:GetSpellData(_E).name then
 			Tiger, Turtle, Bear, Phoenix = false, false, true, false
-			AttackCount, TurtleCount = 0, 0
+			AttackCount = 0
 		end
 		if spell and spell.name == myHero:GetSpellData(_R).name then     
 			Tiger, Turtle, Bear, Phoenix = false, false, false, true
-			AttackCount, TurtleCount = 0, 0
+			AttackCount = 3
 		end
 		if spell.name:find("Attack") then
-			if (Target and spell.target == Target) or (Minion and spell.target == Minion) then
-				if Tiger == true or Phoenix == true then
-					AttackCount = AttackCount + 1
-				elseif Turtle == true then
-					TurtleCount = TurtleCount + 1
-				end
+			if Phoenix == true or Tiger == true then
+				AttackCount = AttackCount + 1
 			end
 		end
 	end
@@ -211,6 +221,7 @@ end
 
 function OnCreateObj(obj)
 	if GetDistance(obj) <= 70 and (obj.name == "Udyr_PhoenixBreath_cas.troy" or obj.name == "Udyr_Spirit_Phoenix_Breath_cas.troy") then
+		AttackCount = 1
 		FlameBreath = true
 	end
 	if GetDistance(obj) <= 450 and (obj.name == "udyr_tiger_claw_tar.troy" or obj.name == "Udyr_Spirit_Tiger_Claw_tar.troy") then
