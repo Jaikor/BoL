@@ -165,7 +165,7 @@ function OrbwalkCheck()
  if _G.AutoCarry then
   sacused = true
   Menu.Orbwalking:addParam("info11","SAC Detected", SCRIPT_PARAM_INFO, "")
- elseif _G.Reborn_Loaded then
+ elseif _G.Reborn_Initialised then
   DelayAction(OrbwalkCheck, 1)
  elseif _G.MMA_Loaded then
   Menu.Orbwalking:addParam("info11","MMA Detected", SCRIPT_PARAM_INFO, "")
