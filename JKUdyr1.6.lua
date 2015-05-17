@@ -1,4 +1,4 @@
-local VERSION = "1.5"
+local VERSION = "1.6"
 if myHero.charName ~= "Udyr" then return end
 
  require 'SxOrbWalk'
