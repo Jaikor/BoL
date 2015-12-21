@@ -72,8 +72,8 @@ class 'Katarina'
 		AddDrawCallback(function() self:Draw() end)
 		AddMsgCallback(function (msg, key) self:WndMsg(msg, key) end)
 		AddProcessSpellCallback(function(unit, spell) self:Spells(unit, spell)	end)
-		AddApplyBuffCallback(function(unit, source, buff) self:ApplyBuff(unit, source, buff) end)
-		AddRemoveBuffCallback(function(unit, buff) self:RemoveBuff(unit, buff) end)
+		AddApplyBuffCallback(function(unit, source, buff) self:OnApplyBuff(unit, source, buff) end)
+		AddRemoveBuffCallback(function(unit, buff) self:OnRemoveBuff(unit, buff) end)
 		AddCastSpellCallback(function(iSpell, startPos, endPos, targetUnit) self:OnCastSpell(iSpell,startPos,endPos,targetUnit) end)
 		AddCreateObjCallback(function(obj) self:ObjCreate(obj) end)
 		AddDeleteObjCallback(function(obj) self:ObjDelete(obj) end)
@@ -634,7 +634,7 @@ class 'Katarina'
 		end
 	end
 
-	function Katarina:ApplyBuff(unit, source,  buff)
+	function Katarina:OnApplyBuff(unit, source,  buff)
 		if unit == myHero and buff.name == 'katarinaqmark' then
 			self.targetsWithQ[source.networkID] = true
 			if self.Q.throwing then
@@ -643,7 +643,7 @@ class 'Katarina'
 		end
 	end
 
-	function Katarina:RemoveBuff(unit, buff)
+	function Katarina:OnRemoveBuff(unit, buff)
 		if buff.name == 'katarinaqmark' then
 			self.targetsWithQ[unit.networkID] = nil
 		end
