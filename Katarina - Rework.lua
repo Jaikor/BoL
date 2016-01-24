@@ -144,6 +144,7 @@ class 'Katarina'
 			self.menu:addSubMenu('-~=[Other Settings]=~-', 'other')
 				self.menu.other:addParam('maxjump', 'Always Ward Jump at Max Range', SCRIPT_PARAM_ONOFF, true)
 				self.menu.other:addParam('drawText', 'Draw Damage Text on Enemy', SCRIPT_PARAM_ONOFF, true)
+                self.menu.other:addParam('skins', 'Skin Changer', SCRIPT_PARAM_LIST, 1,{"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "Sandstorm", "Slay Belle", "Warring Kingdoms"})
 
 			--|> Main Keys
 			self.menu:addParam('comboKey',    'Full Combo Key', SCRIPT_PARAM_ONKEYDOWN, false, GetKey('X'))
@@ -171,6 +172,7 @@ class 'Katarina'
 	end
 
 	function Katarina:Tick()
+    SetSkin(myHero, self.menu.other.skins - 1)
 		self.target = self:GetTarget()
 		if self.target  and not self.using then
 			if self.menu.comboKey then
