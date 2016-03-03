@@ -35,7 +35,9 @@ class 'Katarina'
 		self:Menu()
 
 		--|> Ignite Slot
-		self.ignite = myHero:GetSpellData(SUMMONER_1).name:find("summonerdot") and SUMMONER_1 or myHero:GetSpellData(SUMMONER_2).name:find("summonerdot") and SUMMONER_2 or nil
+		--self.ignite = myHero:GetSpellData(SUMMONER_1).name:find("summonerdot") and SUMMONER_1 or myHero:GetSpellData(SUMMONER_2).name:find("summonerdot") and SUMMONER_2 or nil
+        self.ignite =  myHero:GetSpellData(SUMMONER_1).name:lower() == "summonerdot"  and SUMMONER_1 or myHero:GetSpellData(SUMMONER_2).name:lower() == "summonerdot" and SUMMONER_2 or nil
+        
 
 		--|> SAC & MMA Combability
 		self.comp = false
@@ -44,7 +46,7 @@ class 'Katarina'
 		self.target = nil
 
 		--|> Items Table
-		--self:LoadItemsTable()
+		self:LoadItemsTable()
 
 		--|> Wards Table
 		self.wardsTable = {}
@@ -114,7 +116,7 @@ class 'Katarina'
 			--|> Combo Settings Menu
 			self.menu:addSubMenu('-~=[Combo Settings]=~-', 'combo')
 				self.menu.combo:addParam('procQ',    'Detonate Q Mark', SCRIPT_PARAM_ONOFF, true)
-				--self.menu.combo:addParam('useItems', 'Use Items',       SCRIPT_PARAM_ONOFF, true)
+				self.menu.combo:addParam('useItems', 'Use Items',       SCRIPT_PARAM_ONOFF, true)
 			
 			--|> Harrass Settings Menu
 			self.menu:addSubMenu('-~=[Harass Settings]=~-', 'harass')
@@ -144,8 +146,10 @@ class 'Katarina'
 			self.menu:addSubMenu('-~=[Other Settings]=~-', 'other')
 				self.menu.other:addParam('maxjump', 'Always Ward Jump at Max Range', SCRIPT_PARAM_ONOFF, true)
 				self.menu.other:addParam('drawText', 'Draw Damage Text on Enemy', SCRIPT_PARAM_ONOFF, true)
-                self.menu.other:addParam('skins', 'Skin Changer', SCRIPT_PARAM_LIST, 1,{"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "Sandstorm", "Slay Belle", "Warring Kingdoms"})
-
+                if VIP_USER then
+                self.menu.other:addParam('skins', 'Skin Changer', SCRIPT_PARAM_LIST, 1,{"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "High Command", "Sandstorm", "Slay Belle", "Warring Kingdoms"})
+                end
+                
 			--|> Main Keys
 			self.menu:addParam('comboKey',    'Full Combo Key', SCRIPT_PARAM_ONKEYDOWN, false, GetKey('X'))
 			self.menu:addParam('harassKey',   'Harass Key',     SCRIPT_PARAM_ONKEYDOWN, false, GetKey('C'))
@@ -300,9 +304,9 @@ class 'Katarina'
 	end
 
 	function Katarina:Combo(target)
-		--if self.menu.combo.useItems then
-		--	self:UseItems(target)
-		--end
+		if self.menu.combo.useItems then
+			self:UseItems(target)
+		end
 		if self.menu.skills.Q.comboQ then
 			self.spells.Q:Cast(target)
 		end
@@ -504,7 +508,7 @@ class 'Katarina'
 		end
 	end
 
---[[    
+
 	function Katarina:UseItems(target)
 		for i, Item in pairs(self.items) do
 			local Item = self.items[i]
@@ -513,7 +517,7 @@ class 'Katarina'
 			end
 		end
 	end
-]]--
+
 
 	function Katarina:WardJump(x, y, enemy)
 		if GetDistance(mousePos) and not enemy then
@@ -705,7 +709,7 @@ class 'Katarina'
 		}
 	end
 
---[[    
+   
 	function Katarina:LoadItemsTable()
 		self.items = {
 			["BLACKFIRE"]	= { id = 3188, range = 750 },
@@ -721,7 +725,7 @@ class 'Katarina'
 			["YGB"]			= { id = 3142, range = 350 }
 		}
 	end
-]]--
+
 
 	function Katarina:SetTablePriorities()
 		local table = GetEnemyHeroes()
@@ -809,7 +813,7 @@ class 'Spells'
 		return strings[slot]
 	end
 
-
+--[[
 --|> Auto Updater
 class 'Update'
 	function Update:__init(version)
@@ -847,10 +851,11 @@ class 'Update'
             self.needUpdate = false
 		end
 	end
-
+]]--
+    
 --|> Self Initiation
 function OnLoad()
 	--|> Superx Said Load OnLoad so Load OnLoad
-	Update(KatarinaVersion)
+	--Update(KatarinaVersion)
 	Katarina = Katarina()
 end
