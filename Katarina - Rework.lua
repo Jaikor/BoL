@@ -49,7 +49,7 @@ class 'Katarina'
 	function Katarina:__init()
          --|> Version checker and updater
         self.Version = 3.37
-        self:CheckUpdates()
+        --self:CheckUpdates()
 		--|> Spell Information
 		self.spells = {
 			Q = Spells(_Q, 675, 'Bouncing Blades', 'targeted', ARGB(255,178, 0 , 0 )),
