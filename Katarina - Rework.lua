@@ -16,6 +16,7 @@ local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
 local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
 local whatsnew = 0
 
+function KataUpdate()
 if AUTOUPDATE then
 	local ServerData = GetWebResult(UPDATE_HOST, "/Jaikor/BoL/master/Versions/Katarina.Version")
 	if ServerData then
@@ -34,6 +35,7 @@ if AUTOUPDATE then
 			EnvoiMessage("Error downloading version info")
 	end
 end
+end
  --- End Of AutoUpdate
 
 
@@ -49,7 +51,8 @@ class 'Katarina'
 	function Katarina:__init()
          --|> Version checker and updater
         self.Version = 3.37
-        --self:CheckUpdates()
+        self:CheckUpdates()
+		KataUpdate()
 		--|> Spell Information
 		self.spells = {
 			Q = Spells(_Q, 675, 'Bouncing Blades', 'targeted', ARGB(255,178, 0 , 0 )),
