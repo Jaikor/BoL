@@ -5,11 +5,46 @@ TrackerLoad("FTqjCPEE6ycKT2fq")
 
 --local KatarinaVersion = 3.36
 
+--- Starting AutoUpdate
+local version = "3.38"
+local author = "Skeem & Jaikor"
+local SCRIPT_NAME = "Katarina - Rework"
+local AUTOUPDATE = true
+local UPDATE_HOST = "raw.githubusercontent.com"
+local UPDATE_PATH = "/Jaikor/BoL/master/Katarina%20-%20Rework.lua".."?rand="..math.random(1,10000)
+local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
+local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
+local whatsnew = 0
+
+if AUTOUPDATE then
+	local ServerData = GetWebResult(UPDATE_HOST, "/Jaikor/BoL/master/Versions/Katarina.Version")
+	if ServerData then
+		ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
+		if ServerVersion then
+			if tonumber(version) < ServerVersion then
+				EnvoiMessage("New version available "..ServerVersion)
+				EnvoiMessage(">>Updating, please don't press F9<<")
+				DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () EnvoiMessage("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
+				whatsnew = 1
+			else
+				DelayAction(function() EnvoiMessage("Hello, "..GetUser()..". You got the latest version! :) ("..ServerVersion..")") end, 3)
+			end
+		end
+		else
+			EnvoiMessage("Error downloading version info")
+	end
+end
+ --- End Of AutoUpdate
+
+
+
+
+
 --|> Cuz superx is the only lua bender
 require 'SxOrbWalk'
 
 class 'Katarina'
-class 'Download'
+--class 'Download'
 
 	function Katarina:__init()
          --|> Version checker and updater
@@ -862,6 +897,7 @@ class 'Update'
 	end
 ]]--
 
+--[[
 
 function Katarina:CheckUpdates()
 	host = "www.scarjit.de"
@@ -1040,6 +1076,7 @@ function Download:downloadUpdate(host, file, name, path, _callback,version, vers
 	end)
 
 end
+]]--
     
 --|> Self Initiation
 function OnLoad()
