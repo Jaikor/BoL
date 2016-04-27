@@ -51,7 +51,7 @@ class 'Katarina'
 
 	function Katarina:__init()
          --|> Version checker and updater
-        self.Version = 3.37
+        --self.Version = 3.37
         --self:CheckUpdates()
 		KataUpdate()
 		--|> Spell Information
