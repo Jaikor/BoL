@@ -7,7 +7,7 @@ TrackerLoad("FTqjCPEE6ycKT2fq")
 --local KatarinaVersion = 3.36
 
 --- Starting AutoUpdate
-local version = "3.40"
+local version = "3.41"
 local author = "Skeem & Jaikor"
 local SCRIPT_NAME = "Katarina - Rework"
 local AUTOUPDATE = true
@@ -193,7 +193,7 @@ class 'Katarina'
 			self.menu:addSubMenu('-~=[Other Settings]=~-', 'other')
 				self.menu.other:addParam('maxjump', 'Always Ward Jump at Max Range', SCRIPT_PARAM_ONOFF, true)
 				self.menu.other:addParam('drawText', 'Draw Damage Text on Enemy', SCRIPT_PARAM_ONOFF, true)
-				--[[
+			
                 if VIP_USER then
 				self.menu.other:addSubMenu("Skin Changer", "Skin")
                 --self.menu.other:addParam('skins', 'Skin Changer', SCRIPT_PARAM_LIST, 1,{"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "High Command", "Sandstorm", "Slay Belle", "Warring Kingdoms", "PROJECT"})
@@ -214,7 +214,7 @@ class 'Katarina'
 							end
 						end)
 				end
-				]]--
+				
                 
 			--|> Main Keys
 			self.menu:addParam('comboKey',    'Full Combo Key', SCRIPT_PARAM_ONKEYDOWN, false, GetKey('X'))
@@ -243,13 +243,9 @@ class 'Katarina'
 
 	function Katarina:Tick()
 		if VIP_USER then
-		if self.menu.other.Skin.Enable then
-				SetSkin(myHero, -1)
-			end
-			
-		if self.menu.other.Skin.Enable then
-			SetSkin(myHero, self.menu.other.Skin.skins -1)
-		end		
+			if self.menu.other.Skin.Enable then
+				SetSkin(myHero, self.menu.other.Skin.skins -1)
+			end		
 		end
 		self.target = self:GetTarget()
 		if self.target  and not self.using then
