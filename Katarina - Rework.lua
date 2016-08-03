@@ -7,7 +7,7 @@ TrackerLoad("FTqjCPEE6ycKT2fq")
 --local KatarinaVersion = 3.36
 
 --- Starting AutoUpdate
-local version = "3.39"
+local version = "3.40"
 local author = "Skeem & Jaikor"
 local SCRIPT_NAME = "Katarina - Rework"
 local AUTOUPDATE = true
@@ -65,6 +65,7 @@ class 'Katarina'
 		self.Q = {throwing = false, last = 0}
 		self.targetsWithQ = {}
 
+		
 		--|> Tracks E for Humanizer
 		self.E = {last = 0, delay = 0, canuse = true}
 
@@ -127,7 +128,7 @@ class 'Katarina'
 		AddDeleteObjCallback(function(obj) self:ObjDelete(obj) end)
 
 		--|> Prints Loaded
-		print("<font color=\"#FF0000\">[Nintendo Katarina]:</font> <font color=\"#FFFFFF\">Loaded Version: "..self.Version.."</font>")
+		print("<font color=\"#FF0000\">[Nintendo Katarina]:</font> <font color=\"#FFFFFF\">Loaded Version: "..version.."</font>")
 	end
 
 
@@ -192,9 +193,28 @@ class 'Katarina'
 			self.menu:addSubMenu('-~=[Other Settings]=~-', 'other')
 				self.menu.other:addParam('maxjump', 'Always Ward Jump at Max Range', SCRIPT_PARAM_ONOFF, true)
 				self.menu.other:addParam('drawText', 'Draw Damage Text on Enemy', SCRIPT_PARAM_ONOFF, true)
+				--[[
                 if VIP_USER then
-                self.menu.other:addParam('skins', 'Skin Changer', SCRIPT_PARAM_LIST, 1,{"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "High Command", "Sandstorm", "Slay Belle", "Warring Kingdoms"})
-                end
+				self.menu.other:addSubMenu("Skin Changer", "Skin")
+                --self.menu.other:addParam('skins', 'Skin Changer', SCRIPT_PARAM_LIST, 1,{"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "High Command", "Sandstorm", "Slay Belle", "Warring Kingdoms", "PROJECT"})
+                self.menu.other.Skin:addParam("Enable", "Enable Skin Changer : ", SCRIPT_PARAM_ONOFF, false)
+						self.menu.other.Skin:setCallback("Enable", function (nV)
+							if nV then
+								SetSkin(myHero, self.menu.other.Skin.skins -1)
+							else
+								SetSkin(myHero, -1)
+							end
+						end)
+					self.menu.other.Skin:addParam("skins", 'Which Skin :', SCRIPT_PARAM_LIST, 1, {"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "High Command", "Sandstorm", "Slay Belle", "Warring Kingdoms", "PROJECT"})
+						self.menu.other.Skin:setCallback("skins", function (nV)
+							if nV then
+								if self.menu.other.Skin.Enable then
+									SetSkin(myHero, self.menu.other.Skin.skins -1)
+								end
+							end
+						end)
+				end
+				]]--
                 
 			--|> Main Keys
 			self.menu:addParam('comboKey',    'Full Combo Key', SCRIPT_PARAM_ONKEYDOWN, false, GetKey('X'))
@@ -222,9 +242,15 @@ class 'Katarina'
 	end
 
 	function Katarina:Tick()
-    if VIP_USER then
-    SetSkin(myHero, self.menu.other.skins - 1)
-    end
+		if VIP_USER then
+		if self.menu.other.Skin.Enable then
+				SetSkin(myHero, -1)
+			end
+			
+		if self.menu.other.Skin.Enable then
+			SetSkin(myHero, self.menu.other.Skin.skins -1)
+		end		
+		end
 		self.target = self:GetTarget()
 		if self.target  and not self.using then
 			if self.menu.comboKey then
