@@ -1,6 +1,6 @@
 --[[
 
-JKUdyr v1.7 by JaiKor
+JKUdyr v1.8 by JaiKor
 
 ]]--
 LoadEncryptedScript([[hJcNUnj7NTuSsI4is/m6ChMCTXiPSF61TMFF6tWOQuVVXtE2MDyvyYlbNtjCUUiDd4kPnZ9HS7geu+fwFNa8Z/gaP0sxUzMNv4dsV1dnIx9jviG7+lPFZHktczrMwTzNl5eoj8F752P0JfwPjPtaM7
