@@ -1,9 +1,11 @@
+-- JKRumble v0.1 by JaiKor
+-- don't touch anything below
 _G.ScriptNameL = "JKRumble"
 _G.ScriptNameW = "jkrumble"
 
 _G.ServerTimeout = 13
 _G.ScriptPasswordW = ""
--- don't touch anything below
+
 LoadEncryptedScript([[gl+4aoOCFW5rNI3323VhC/oXDSyugY6VR2PoFGtYZ2ZXJJ20Lr6QY78WM0XyOfhHus0DkWpeyPjYul9wH1zRpJq6/PD0j1r7g3SyoclBmnIfcaDNp5fAgQj8Z+KHLM0tFt7j6jJSwFXr4DcAOvSgtT
 7nO8dDd2epkrP5cADBOm5cO80T/+9g4VB/+0HJpBXZChT8If+zvRYg6+/j21COSfySFXWLOIYfElZdqHerNHqSRoAxb0nVPqWIqS2aMMxH7D9PIl0tr9uLIeDB4H+VGQsqpf0RPp6hABC7/K//ROyt
 ENpUyBuXK27yEKj3eDKJ/iJL83wYJF9XUqHuVBca16+drnjs/s0TCZ85ku9+I5vl9oyLsFB+v016l4fpM/imq83Nl1xFKpFSv5o5Z1KVWqOujj2jnezr2cklIm5inWs3lp8IjYst1Fkd5b7yb8B6ah
