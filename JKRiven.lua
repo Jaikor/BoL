@@ -1,5 +1,5 @@
--- JKRiven v5.4 by JaiKor 
--- updated for League 7.1
+-- JKRiven v5.5 by JaiKor 
+-- updated for League 7.10
 -- do NOT touch anything below 
 
 _G.ScriptNameL = "JKRiven"
